@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>EZDB</title>
+</head>
+<body>
+    <h1>EZDB</h1>
+
+    <form method="POST" action="{{ url_for('connect_sql') }}">
+        <input type="text" id="dbURLInput" name="dbURLInput" placeholder="DB URL">
+        <button>Connect</button>
+    </form>
+    
+    <form method="POST" action="{{ url_for('dispose_sql') }}">
+        <button>Dispose</button>
+    </form>
+    
+    <div id="message"></div>
+    
+    <script>
+        document.querySelectorAll("form").forEach((form) => {
+            form.addEventListener("submit", async function (event) {
+                event.preventDefault();
+                const formData = new FormData(form);
+                const response = await fetch(form.action, {
+                    method: "POST",
+                    body: formData
+                });
+                const message = await response.text();
+                document.getElementById("message").innerText = message;
+            });
+        });
+    </script>
+</body>
+</html>
