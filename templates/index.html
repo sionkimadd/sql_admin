@@ -8,18 +8,58 @@
 <body>
     <h1>EZDB</h1>
 
-    <form method="POST" action="{{ url_for('connect_sql') }}">
+    <form method="POST" action="{{ url_for('connect_db') }}">
         <input type="text" id="dbURLInput" name="dbURLInput" placeholder="DB URL">
-        <button>Connect</button>
+        <button type="submit">Connect</button>
     </form>
     
-    <form method="POST" action="{{ url_for('dispose_sql') }}">
-        <button>Dispose</button>
+    <form method="POST" action="{{ url_for('dispose_db') }}">
+        <button type="submit">Dispose</button>
+    </form>
+
+    <form method="POST" action="{{ url_for('create_table') }}">
+        <input type="text" id="tableNameInput" name="tableNameInput" placeholder="Table Name">
+        <div id="columns">
+            <div class="column">
+                <input type="text" name="columnNameInput" placeholder="Column Name">
+                <select name="columnTypeInput">
+                    <option value="INT">Int</option>
+                    <option value="FLOAT">Float</option>
+                    <option value="CHAR(3)">CHAR(3)</option>
+                    <option value="VARCHAR(255)">Varchar(255)</option>
+                    <option value="TEXT">Text</option>
+                    <option value="DATE">Date</option>
+                    <option value="DATETIME">DateTime</option>
+                    <option value="BOOLEAN">Boolean</option>
+                </select>
+            </div>
+        </div>
+        <button type="button" onclick="addColumn()">Add Column</button>
+        <button type="submit">Create Table</button>
     </form>
     
     <div id="message"></div>
     
     <script>
+        function addColumn() {
+            const columnDiv = document.createElement("div");
+            columnDiv.classList.add("column");
+            columnDiv.innerHTML = `
+                <input type="text" name="columnNameInput" placeholder="Column Name">
+                <select name="columnTypeInput">
+                    <option value="INT">Int</option>
+                    <option value="FLOAT">Float</option>
+                    <option value="CHAR(3)">CHAR(3)</option>
+                    <option value="VARCHAR(255)">Varchar(255)</option>
+                    <option value="TEXT">Text</option>
+                    <option value="DATE">Date</option>
+                    <option value="DATETIME">DateTime</option>
+                    <option value="BOOLEAN">Boolean</option>
+                </select>
+            `;
+            document.getElementById("columns").appendChild(columnDiv);
+        }
+
         document.querySelectorAll("form").forEach((form) => {
             form.addEventListener("submit", async function (event) {
                 event.preventDefault();

@@ -9,8 +9,8 @@ db_engine = None
 def index():
     return render_template("index.html")
 
-@app.route("/connect", methods=["POST"])
-def connect_sql():
+@app.route("/connect_db", methods=["POST"])
+def connect_db():
     db_url = request.form.get("dbURLInput")
     global db_engine
     if not db_url:
@@ -25,8 +25,8 @@ def connect_sql():
     else:
         return message
 
-@app.route("/dispose", methods=["POST"])
-def dispose_sql():
+@app.route("/dispose_db", methods=["POST"])
+def dispose_db():
     global db_engine
     if db_engine:
         connection = DisposeSQL(db_engine)
@@ -34,6 +34,20 @@ def dispose_sql():
         db_engine = None
         return message
     return "Failed: Deactivated DB"
+
+@app.route("/create_table", methods=["POST"])
+def create_table():
+    table_name = request.form.get("tableNameInput")
+    column_names = request.form.getlist("columnNameInput")
+    column_types = request.form.getlist("columnTypeInput")
+    
+    if not table_name or not column_names or not column_types:
+        return "Failed: Undefined Table Name or Columns"
+
+    columns = list(zip(column_names, column_types))
+    create_table_query = CreateTableQuery(db_engine, table_name, columns)
+    message = create_table_query.execute()
+    return message
 
 if __name__ == "__main__":
     app.run(debug=True)
