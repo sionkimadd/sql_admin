@@ -18,7 +18,7 @@
     </form>
 
     <form method="POST" action="{{ url_for('create_table') }}">
-        <input type="text" id="tableNameInput" name="tableNameInput" placeholder="Table Name">
+        <input type="text" id="tableNameInput" name="tableNameInput" placeholder="Table Name to Create">
         <div id="columns">
             <div class="column">
                 <input type="text" name="columnNameInput" placeholder="Column Name">
@@ -38,6 +38,11 @@
         <button type="submit">Create Table</button>
     </form>
     
+    <form method="POST" action="{{ url_for('drop_table') }}">
+        <input type="text" id="dropTableNameInput" name="dropTableNameInput" placeholder="Table Name to Drop">
+        <button type="submit">Drop Table</button>
+    </form>
+
     <div id="message"></div>
     
     <script>

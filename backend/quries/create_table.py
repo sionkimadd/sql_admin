@@ -7,11 +7,10 @@ class CreateTableQuery:
         self.columns = columns
 
     def execute(self):
-        column_defs = [f"{name} {type}" for name, type in self.columns]
-        query = f"CREATE TABLE IF NOT EXISTS {self.table_name} ({', '.join(column_defs)});"
-        
         try:
             with self.__db_engine.connect() as c:
+                column_defs = [f"{name} {type}" for name, type in self.columns]
+                query = f"CREATE TABLE {self.table_name} ({', '.join(column_defs)});"
                 c.execute(text(query))
             return "Succeed: Created Table"
         except Exception:

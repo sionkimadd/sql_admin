@@ -6,6 +6,7 @@
 
 1. Connect and Dispose from DB (O)
 2. Create Quries ( )
-- `Create Table` 
+- `Create Table`
+- `Drop Table` 
 3. Flask ( )
 4. Deploy ( )

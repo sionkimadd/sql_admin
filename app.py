@@ -29,8 +29,8 @@ def connect_db():
 def dispose_db():
     global db_engine
     if db_engine:
-        connection = DisposeSQL(db_engine)
-        message = connection.close_connection()
+        disposal = DisposeSQL(db_engine)
+        message = disposal.close_connection()
         db_engine = None
         return message
     return "Failed: Deactivated DB"
@@ -47,6 +47,17 @@ def create_table():
     columns = list(zip(column_names, column_types))
     create_table_query = CreateTableQuery(db_engine, table_name, columns)
     message = create_table_query.execute()
+    return message
+
+@app.route("/drop_table", methods=["POST"])
+def drop_table():
+    table_name = request.form.get("dropTableNameInput")
+    
+    if not table_name:
+        return "Failed: Undefined Table Name"
+    
+    drop_table_query = DropTableQuery(db_engine, table_name)
+    message = drop_table_query.execute()
     return message
 
 if __name__ == "__main__":
