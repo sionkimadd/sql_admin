@@ -8,5 +8,6 @@
 2. Create Quries ( )
 - `Create Table`
 - `Drop Table` 
+- `Insert Data`
 3. Flask ( )
 4. Deploy ( )

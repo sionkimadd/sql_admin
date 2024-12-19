@@ -60,5 +60,41 @@ def drop_table():
     message = drop_table_query.execute()
     return message
 
+@app.route("/insert_data", methods=["POST"])
+def insert_data():
+    table_name = request.form.get("tableNameInput")
+    column_names = request.form.getlist("columnNameInput")
+    column_values = request.form.getlist("columnValueInput")
+    
+    if not table_name or not table_name.strip():
+        return "Failed: Undefined Table Name"
+    
+    if not column_names or any(not name.strip() for name in column_names):
+        return "Failed: Undefined Column Names"
+    
+    column_values = [value.split(",") for value in column_values]
+    max_length_values = max(len(values) for values in column_values)
+    
+    for values in column_values:
+        while len(values) < max_length_values:
+            values.append(None)
+
+    data = []
+    for values in zip(*column_values):
+        row = {}
+        for i in range(len(column_names)):
+            column_name = column_names[i]
+            value = values[i]
+            if value is not None:
+                value = value.strip()
+            else:
+                value = None
+            row[column_name] = value
+        data.append(row)
+
+    insert_data_query = InsertDataQuery(db_engine, table_name, column_names, data)
+    message = insert_data_query.execute()
+    return message
+
 if __name__ == "__main__":
     app.run(debug=True)

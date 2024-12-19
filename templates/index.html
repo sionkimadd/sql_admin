@@ -43,6 +43,18 @@
         <button type="submit">Drop Table</button>
     </form>
 
+    <form method="POST" action="{{ url_for('insert_data') }}">
+        <input type="text" id="tableNameInput" name="tableNameInput" placeholder="Table Name to Insert Data">
+        <div id="rows">
+            <div class="row">
+                <input type="text" name="columnNameInput" placeholder="Column Name">
+                <textarea name="columnValueInput" placeholder="Value e.g. a, b, c, d"></textarea>
+            </div>
+        </div>
+        <button type="button" onclick="addRow()">Add Row</button>
+        <button type="submit">Insert Data</button>
+    </form>
+
     <div id="message"></div>
     
     <script>
@@ -63,6 +75,16 @@
                 </select>
             `;
             document.getElementById("columns").appendChild(columnDiv);
+        }
+
+        function addRow() {
+            const rowDiv = document.createElement("div");
+            rowDiv.classList.add("row");
+            rowDiv.innerHTML = `
+                <input type="text" name="columnNameInput" placeholder="Column Name">
+                <textarea name="columnValueInput" placeholder="Value e.g. a, b, c, d"></textarea>
+            `;
+            document.getElementById("rows").appendChild(rowDiv);
         }
 
         document.querySelectorAll("form").forEach((form) => {
