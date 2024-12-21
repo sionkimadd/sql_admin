@@ -6,56 +6,68 @@
     <title>EZDB</title>
 </head>
 <body>
-    <h1>EZDB</h1>
+    <div class="container">
+        <div class="left-panel">
+            <h1>EZDB</h1>
 
-    <form method="POST" action="{{ url_for('connect_db') }}">
-        <input type="text" id="dbURLInput" name="dbURLInput" placeholder="DB URL">
-        <button type="submit">Connect</button>
-    </form>
-    
-    <form method="POST" action="{{ url_for('dispose_db') }}">
-        <button type="submit">Dispose</button>
-    </form>
+            <form method="POST" action="{{ url_for('connect_db') }}">
+                <input type="text" id="dbURLInput" name="dbURLInput" placeholder="DB URL">
+                <button type="submit">Connect</button>
+            </form>
+            
+            <form method="POST" action="{{ url_for('dispose_db') }}">
+                <button type="submit">Dispose</button>
+            </form>
 
-    <form method="POST" action="{{ url_for('create_table') }}">
-        <input type="text" id="tableNameInput" name="tableNameInput" placeholder="Table Name to Create">
-        <div id="columns">
-            <div class="column">
-                <input type="text" name="columnNameInput" placeholder="Column Name">
-                <select name="columnTypeInput">
-                    <option value="INT">Int</option>
-                    <option value="FLOAT">Float</option>
-                    <option value="CHAR(3)">CHAR(3)</option>
-                    <option value="VARCHAR(255)">Varchar(255)</option>
-                    <option value="TEXT">Text</option>
-                    <option value="DATE">Date</option>
-                    <option value="DATETIME">DateTime</option>
-                    <option value="BOOLEAN">Boolean</option>
-                </select>
+            <form method="POST" action="{{ url_for('create_table') }}">
+                <input type="text" id="tableNameInput" name="tableNameInput" placeholder="Table Name to Create">
+                <div id="columns">
+                    <div class="column">
+                        <input type="text" name="columnNameInput" placeholder="Column Name">
+                        <select name="columnTypeInput">
+                            <option value="INT">Int</option>
+                            <option value="FLOAT">Float</option>
+                            <option value="CHAR(3)">CHAR(3)</option>
+                            <option value="VARCHAR(255)">Varchar(255)</option>
+                            <option value="TEXT">Text</option>
+                            <option value="DATE">Date</option>
+                            <option value="DATETIME">DateTime</option>
+                            <option value="BOOLEAN">Boolean</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="button" onclick="addColumn()">Add Column</button>
+                <button type="submit">Create Table</button>
+            </form>
+            
+            <form method="POST" action="{{ url_for('drop_table') }}">
+                <input type="text" id="dropTableNameInput" name="dropTableNameInput" placeholder="Table Name to Drop">
+                <button type="submit">Drop Table</button>
+            </form>
+
+            <form method="POST" action="{{ url_for('insert_data') }}">
+                <input type="text" id="tableNameInput" name="tableNameInput" placeholder="Table Name to Insert Data">
+                <div id="rows">
+                    <div class="row">
+                        <input type="text" name="columnNameInput" placeholder="Column Name">
+                        <textarea name="columnValueInput" placeholder="Value e.g. a, b, c, d"></textarea>
+                    </div>
+                </div>
+                <button type="button" onclick="addRow()">Add Row</button>
+                <button type="submit">Insert Data</button>
+            </form>
+
+            <div id="message"></div>
+        </div>
+        <div class="right-panel">
+            <div id="db-info">
+                <h2>Database Schema</h2>
+                <div id="db-status"></div>
+                <div id="table-list"></div>
+                <div id="table-data"></div>
             </div>
         </div>
-        <button type="button" onclick="addColumn()">Add Column</button>
-        <button type="submit">Create Table</button>
-    </form>
-    
-    <form method="POST" action="{{ url_for('drop_table') }}">
-        <input type="text" id="dropTableNameInput" name="dropTableNameInput" placeholder="Table Name to Drop">
-        <button type="submit">Drop Table</button>
-    </form>
-
-    <form method="POST" action="{{ url_for('insert_data') }}">
-        <input type="text" id="tableNameInput" name="tableNameInput" placeholder="Table Name to Insert Data">
-        <div id="rows">
-            <div class="row">
-                <input type="text" name="columnNameInput" placeholder="Column Name">
-                <textarea name="columnValueInput" placeholder="Value e.g. a, b, c, d"></textarea>
-            </div>
-        </div>
-        <button type="button" onclick="addRow()">Add Row</button>
-        <button type="submit">Insert Data</button>
-    </form>
-
-    <div id="message"></div>
+    </div>
     
     <script>
         function addColumn() {
@@ -87,6 +99,56 @@
             document.getElementById("rows").appendChild(rowDiv);
         }
 
+        async function updateDBInfo() {
+            const response = await fetch("{{ url_for('get_db_info') }}");
+            const data = await response.json();
+            const dbStatusDiv = document.getElementById("db-status");
+            dbStatusDiv.innerText = data.db_status;
+            const tableListDiv = document.getElementById("table-list");
+            tableListDiv.innerHTML = "";
+            data.tables.forEach((table) => {
+                const tableName = document.createElement("div");
+                tableName.classList.add("table-name");
+                tableName.innerText = table;
+                tableName.onclick = () => loadTableData(table);
+                tableListDiv.appendChild(tableName);
+            });
+        }
+        
+        async function loadTableData(tableName) {
+            const response = await fetch(`{{ url_for('get_table_data', table_name='') }}${tableName}`);
+            const data = await response.json();
+            const tableDataDiv = document.getElementById("table-data");
+            tableDataDiv.innerHTML = `<h3>${data.table_name}</h3>`;
+            const tableTag = document.createElement("table");
+            const trColTag = document.createElement("tr");
+            data.column_names.forEach((column_name) => {
+                const thColTag = document.createElement("th");
+                thColTag.innerText = column_name;
+                trColTag.appendChild(thColTag);
+            });
+            tableTag.appendChild(trColTag);
+            if (data.rows.length > 0) {
+                data.rows.forEach((row) => {
+                    const trDataTag = document.createElement("tr");
+                    data.column_names.forEach((columnName) => {
+                        const tdDataTag = document.createElement("td");
+                        tdDataTag.innerText = row[columnName];
+                        trDataTag.appendChild(tdDataTag);
+                    });
+                    tableTag.appendChild(trDataTag);
+                });
+            } else {
+                const trNoDataTag = document.createElement("tr");
+                const tdNoDataTag = document.createElement("td");
+                tdNoDataTag.colSpan = data.column_names.length;
+                tdNoDataTag.innerText = "No Data";
+                trNoDataTag.appendChild(tdNoDataTag);
+                tableTag.appendChild(trNoDataTag);
+            }
+            tableDataDiv.appendChild(tableTag);
+        }
+
         document.querySelectorAll("form").forEach((form) => {
             form.addEventListener("submit", async function (event) {
                 event.preventDefault();
@@ -97,8 +159,10 @@
                 });
                 const message = await response.text();
                 document.getElementById("message").innerText = message;
+                updateDBInfo();
             });
         });
+        updateDBInfo();
     </script>
 </body>
 </html>

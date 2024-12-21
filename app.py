@@ -1,5 +1,6 @@
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, jsonify
 from backend import *
+from sqlalchemy import inspect, text
 
 app = Flask(__name__)
 
@@ -95,6 +96,45 @@ def insert_data():
     insert_data_query = InsertDataQuery(db_engine, table_name, column_names, data)
     message = insert_data_query.execute()
     return message
+
+@app.route("/get_db_info", methods=["GET"])
+def get_db_info():
+    global db_engine
+    if db_engine:
+        db_status = "Connected"
+    else:
+        db_status = "Unconnected"
+    if db_engine:
+        inspector = inspect(db_engine)
+        tables = inspector.get_table_names()
+    else:
+        tables = []
+    return jsonify({"db_status": db_status, "tables": tables})
+
+@app.route("/get_table_data/<table_name>", methods=["GET"])
+def get_table_data(table_name):
+    global db_engine
+    if db_engine:
+        with db_engine.connect() as c:
+            query = f"SELECT * FROM {table_name}"
+            output = c.execute(text(query))
+            rows = []
+            columnNames = output.keys()
+            for row in output.fetchall():
+                row_dict = dict(zip(columnNames, row))
+                rows.append(row_dict)
+            if rows:
+                column_names = list(rows[0].keys())
+            else:
+                column_names_query = f"SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '{table_name}'"
+                column_names_output = c.execute(text(column_names_query))
+                column_names = []
+                for row in column_names_output.fetchall():
+                    column_name = row[0]
+                    column_names.append(column_name)
+        return jsonify({"table_name": table_name, "column_names": column_names, "rows": rows})
+    else:
+        return None
 
 if __name__ == "__main__":
     app.run(debug=True)
