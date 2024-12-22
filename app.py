@@ -1,6 +1,7 @@
 from flask import Flask, request, render_template, jsonify
 from backend import *
 from sqlalchemy import inspect, text
+from backend.queries.update_data import UpdateDataQuery
 
 app = Flask(__name__)
 
@@ -137,6 +138,33 @@ def get_table_data(table_name):
         return jsonify({"table_name": table_name, "column_names": column_names, "column_types": column_types, "rows": rows})
     else:
         return None
+
+@app.route("/update_data", methods=["POST"])
+def update_data():
+    table_name = request.form.get("tableNameInput")
+    condition_column = request.form.get("conditionColInput")
+    condition_value = request.form.get("conditionValueInput")
+    target_columns = request.form.getlist("targetColInput")
+    target_values = request.form.getlist("targetValueInput")
+
+    if not table_name or not table_name.strip():
+        return "Failed: Undefined Table Name"
+    
+    if not condition_column or not condition_column.strip():
+        return "Failed: Undefined Condition Column"
+    
+    if not condition_value or not condition_value.strip():
+        return "Failed: Undefined Condition Value"
+    
+    if not target_columns or any(not column.strip() for column in target_columns):
+        return "Failed: Undefined Target Columns"
+    
+    if not target_values or any(not value.strip() for value in target_values):
+        return "Failed: Undefined Target Values"
+    
+    update_data_query = UpdateDataQuery(db_engine, table_name, condition_column, condition_value, target_columns, target_values)
+    message = update_data_query.execute()
+    return message
 
 if __name__ == "__main__":
     app.run(debug=True)

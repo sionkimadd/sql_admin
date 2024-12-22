@@ -145,6 +145,22 @@ input:focus, textarea:focus, select:focus {
     justify-content: center;
 }
 
+#dataUpdates {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#dataUpdates .dataUpdate {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
 button {
     width: 50%;
     text-align: center;

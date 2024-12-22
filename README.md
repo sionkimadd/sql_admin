@@ -9,5 +9,6 @@
 - `Create Table`
 - `Drop Table` 
 - `Insert Data`
+- `Update Data`
 3. Flask ( )
 4. Deploy ( )

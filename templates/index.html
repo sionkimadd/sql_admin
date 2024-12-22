@@ -57,6 +57,20 @@
                 <button type="button" onclick="addRow()">Add Row</button>
                 <button type="submit">Insert Data</button>
             </form>
+
+            <form method="POST" action="{{ url_for('update_data') }}">
+                <input type="text" id="tableNameInput" name="tableNameInput" placeholder="Table Name to Update Data">
+                <input type="text" id="conditionColInput" name="conditionColInput" placeholder="Condition Column Name">
+                <input type="text" id="conditionValueInput" name="conditionValueInput" placeholder="Condition Column Value">
+                <div id="dataUpdates">
+                    <div class="dataUpdate">
+                        <input type="text" name="targetColInput" placeholder="Target Column">
+                        <input type="text" name="targetValueInput" placeholder="Target Value">
+                    </div>
+                </div>
+                <button type="button" onclick="addTargetUpdate()">Add Target Data</button>
+                <button type="submit">Update Data</button>
+            </form>
         </div>
         <div class="right-panel">
             <div id="db-info">
@@ -109,6 +123,22 @@
         function deleteRow(button) {
             const rowDiv = button.parentElement;
             rowDiv.remove();
+        }
+
+        function addTargetUpdate() {
+            const rowDiv = document.createElement("div");
+            rowDiv.classList.add("dataUpdate");
+            rowDiv.innerHTML = `
+                <input type="text" name="targetColInput" placeholder="Target Column">
+                <input type="text" name="targetValueInput" placeholder="Target Value">
+                <button type="button" onclick="deleteTargetUpdate(this)">Delete</button>
+            `;
+            document.getElementById("dataUpdates").appendChild(rowDiv);
+        }
+
+        function deleteTargetUpdate(button) {
+            const dataUpdateDiv = button.parentElement;
+            dataUpdateDiv.remove();
         }
 
         async function updateDBInfo() {
