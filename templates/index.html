@@ -3,19 +3,20 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="static/css/styles.css" />
     <title>EZDB</title>
 </head>
 <body>
+    <h1>EZDB</h1>
     <div class="container">
         <div class="left-panel">
-            <h1>EZDB</h1>
-
+            <h2><span class="highlight">O</span>peration</h2>
             <form method="POST" action="{{ url_for('connect_db') }}">
                 <input type="text" id="dbURLInput" name="dbURLInput" placeholder="DB URL">
                 <button type="submit">Connect</button>
             </form>
             
-            <form method="POST" action="{{ url_for('dispose_db') }}">
+            <form class="dispose_form" method="POST" action="{{ url_for('dispose_db') }}">
                 <button type="submit">Dispose</button>
             </form>
 
@@ -56,13 +57,12 @@
                 <button type="button" onclick="addRow()">Add Row</button>
                 <button type="submit">Insert Data</button>
             </form>
-
-            <div id="message"></div>
         </div>
         <div class="right-panel">
             <div id="db-info">
-                <h2>Database Schema</h2>
+                <h2><span class="highlight">S</span>chema</h2>
                 <div id="db-status"></div>
+                <div id="message"></div>
                 <div id="table-list"></div>
                 <div id="table-data"></div>
             </div>
@@ -104,6 +104,7 @@
             const data = await response.json();
             const dbStatusDiv = document.getElementById("db-status");
             dbStatusDiv.innerText = data.db_status;
+            dbStatusDiv.className = data.status_class;
             const tableListDiv = document.getElementById("table-list");
             tableListDiv.innerHTML = "";
             data.tables.forEach((table) => {

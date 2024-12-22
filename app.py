@@ -102,14 +102,16 @@ def get_db_info():
     global db_engine
     if db_engine:
         db_status = "Connected"
+        status_class = "success"
     else:
         db_status = "Unconnected"
+        status_class = "fail"
     if db_engine:
         inspector = inspect(db_engine)
         tables = inspector.get_table_names()
     else:
         tables = []
-    return jsonify({"db_status": db_status, "tables": tables})
+    return jsonify({"db_status": db_status, "status_class": status_class, "tables": tables})
 
 @app.route("/get_table_data/<table_name>", methods=["GET"])
 def get_table_data(table_name):
