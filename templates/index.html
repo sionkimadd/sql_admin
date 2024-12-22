@@ -123,9 +123,9 @@
             tableDataDiv.innerHTML = `<h3>${data.table_name}</h3>`;
             const tableTag = document.createElement("table");
             const trColTag = document.createElement("tr");
-            data.column_names.forEach((column_name) => {
+            data.column_names.forEach((column_name, index) => {
                 const thColTag = document.createElement("th");
-                thColTag.innerText = column_name;
+                thColTag.innerText = `${column_name} (${data.column_types[index]})`;
                 trColTag.appendChild(thColTag);
             });
             tableTag.appendChild(trColTag);

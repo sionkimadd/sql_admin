@@ -125,16 +125,16 @@ def get_table_data(table_name):
             for row in output.fetchall():
                 row_dict = dict(zip(columnNames, row))
                 rows.append(row_dict)
-            if rows:
-                column_names = list(rows[0].keys())
-            else:
-                column_names_query = f"SELECT column_name FROM INFORMATION_SCHEMA.COLUMNS WHERE table_name = '{table_name}'"
-                column_names_output = c.execute(text(column_names_query))
-                column_names = []
-                for row in column_names_output.fetchall():
-                    column_name = row[0]
-                    column_names.append(column_name)
-        return jsonify({"table_name": table_name, "column_names": column_names, "rows": rows})
+            column_names_query = f"SELECT COLUMN_NAME, DATA_TYPE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{table_name}' ORDER BY ORDINAL_POSITION"
+            column_names_output = c.execute(text(column_names_query))
+            column_names = []
+            column_types = []
+            for row in column_names_output.fetchall():
+                column_name = row[0]
+                column_type = row[1]
+                column_names.append(column_name)
+                column_types.append(column_type)
+        return jsonify({"table_name": table_name, "column_names": column_names, "column_types": column_types, "rows": rows})
     else:
         return None
 
