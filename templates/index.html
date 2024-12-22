@@ -85,8 +85,14 @@
                     <option value="DATETIME">DateTime</option>
                     <option value="BOOLEAN">Boolean</option>
                 </select>
+                <button type="button" onclick="deleteColumn(this)">Delete</button>
             `;
             document.getElementById("columns").appendChild(columnDiv);
+        }
+
+        function deleteColumn(button) {
+            const columnDiv = button.parentElement;
+            columnDiv.remove();
         }
 
         function addRow() {
@@ -95,8 +101,14 @@
             rowDiv.innerHTML = `
                 <input type="text" name="columnNameInput" placeholder="Column Name">
                 <textarea name="columnValueInput" placeholder="Value e.g. a, b, c, d"></textarea>
+                <button type="button" onclick="deleteRow(this)">Delete</button>
             `;
             document.getElementById("rows").appendChild(rowDiv);
+        }
+
+        function deleteRow(button) {
+            const rowDiv = button.parentElement;
+            rowDiv.remove();
         }
 
         async function updateDBInfo() {
