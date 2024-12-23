@@ -83,8 +83,17 @@ form {
     border-top: 2px solid black;
 }
 
+label {
+    font-size: 1rem;
+    color:white
+}
+
 .dispose_form {
-    padding-top: 2rem;
+    padding-top: 1rem;
+}
+
+.dispose_label {
+    padding-bottom: 1rem;
 }
 
 input, textarea, select {
