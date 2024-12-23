@@ -1,7 +1,6 @@
 from flask import Flask, request, render_template, jsonify
 from backend import *
 from sqlalchemy import inspect, text
-from backend.queries.update_data import UpdateDataQuery
 
 app = Flask(__name__)
 
@@ -16,16 +15,17 @@ def connect_db():
     db_url = request.form.get("dbURLInput")
     global db_engine
     if not db_url:
-        return "Failed: Required DB URL"
+        return jsonify({"message": "Failed: Required DB URL", "query": None})
 
     connection = ConnectSQL(db_url)
     message = connection.select_one()
 
     if message == "Succeed":
         db_engine = connection.get_engine()
-        return "Succeed: Connected DB"
+        query = f"CONNECT TO DATABASE"
+        return jsonify({"message": "Succeed: Connected DB", "query": query})
     else:
-        return message
+        return jsonify({"message": message, "query": None})
 
 @app.route("/dispose_db", methods=["POST"])
 def dispose_db():
@@ -34,8 +34,9 @@ def dispose_db():
         disposal = DisposeSQL(db_engine)
         message = disposal.close_connection()
         db_engine = None
-        return message
-    return "Failed: Deactivated DB"
+        query = "DISPOSE DATABASE CONNECTION"
+        return jsonify({"message": message, "query": query})
+    return jsonify({"message": "Failed: Deactivated DB", "query": None})
 
 @app.route("/create_table", methods=["POST"])
 def create_table():
@@ -44,23 +45,23 @@ def create_table():
     column_types = request.form.getlist("columnTypeInput")
     
     if not table_name or not column_names or not column_types:
-        return "Failed: Undefined Table Name or Columns"
+        return jsonify({"message": "Failed: Undefined Table Name or Columns", "query": None})
 
     columns = list(zip(column_names, column_types))
     create_table_query = CreateTableQuery(db_engine, table_name, columns)
-    message = create_table_query.execute()
-    return message
+    message, query = create_table_query.execute()
+    return jsonify({"message": message, "query": query})
 
 @app.route("/drop_table", methods=["POST"])
 def drop_table():
     table_name = request.form.get("dropTableNameInput")
     
     if not table_name:
-        return "Failed: Undefined Table Name"
+        return jsonify({"message": "Failed: Undefined Table Name", "query": None})
     
     drop_table_query = DropTableQuery(db_engine, table_name)
-    message = drop_table_query.execute()
-    return message
+    message, query = drop_table_query.execute()
+    return jsonify({"message": message, "query": query})
 
 @app.route("/insert_data", methods=["POST"])
 def insert_data():
@@ -69,10 +70,13 @@ def insert_data():
     column_values = request.form.getlist("columnValueInput")
     
     if not table_name or not table_name.strip():
-        return "Failed: Undefined Table Name"
+        return jsonify({"message": "Failed: Undefined Table Name", "query": None})
     
     if not column_names or any(not name.strip() for name in column_names):
-        return "Failed: Undefined Column Names"
+        return jsonify({"message": "Failed: Undefined Column Names", "query": None})
+    
+    if not column_values or any(not value.strip() for value in column_values):
+        return jsonify({"message": "Failed: Undefined Column Values", "query": None})
     
     column_values = [value.split(",") for value in column_values]
     max_length_values = max(len(values) for values in column_values)
@@ -95,8 +99,8 @@ def insert_data():
         data.append(row)
 
     insert_data_query = InsertDataQuery(db_engine, table_name, column_names, data)
-    message = insert_data_query.execute()
-    return message
+    message, query = insert_data_query.execute()
+    return jsonify({"message": message, "query": query})
 
 @app.route("/get_db_info", methods=["GET"])
 def get_db_info():
@@ -148,23 +152,23 @@ def update_data():
     target_values = request.form.getlist("targetValueInput")
 
     if not table_name or not table_name.strip():
-        return "Failed: Undefined Table Name"
+        return jsonify({"message": "Failed: Undefined Table Name", "query": None})
     
     if not condition_column or not condition_column.strip():
-        return "Failed: Undefined Condition Column"
+        return jsonify({"message": "Failed: Undefined Condition Column", "query": None})
     
     if not condition_value or not condition_value.strip():
-        return "Failed: Undefined Condition Value"
+        return jsonify({"message": "Failed: Undefined Condition Value", "query": None})
     
     if not target_columns or any(not column.strip() for column in target_columns):
-        return "Failed: Undefined Target Columns"
+        return jsonify({"message": "Failed: Undefined Target Columns", "query": None})
     
     if not target_values or any(not value.strip() for value in target_values):
-        return "Failed: Undefined Target Values"
+        return jsonify({"message": "Failed: Undefined Target Values", "query": None})
     
     update_data_query = UpdateDataQuery(db_engine, table_name, condition_column, condition_value, target_columns, target_values)
-    message = update_data_query.execute()
-    return message
+    message, query = update_data_query.execute()
+    return jsonify({"message": message, "query": query})
 
 if __name__ == "__main__":
     app.run(debug=True)

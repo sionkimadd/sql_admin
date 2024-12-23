@@ -205,6 +205,23 @@ button:hover::after {
     color: red;
 }
 
+#query-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#query-display #query-text {
+    width: 70%;
+    height: 4rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.8rem;
+    background-color: black;
+    color: white;
+}
 #table-list {
     display: flex;
     flex-direction: column;

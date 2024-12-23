@@ -76,6 +76,9 @@
             <div id="db-info">
                 <h2><span class="highlight">S</span>chema</h2>
                 <div id="db-status"></div>
+                <div id="query-display">
+                    <p id="query-text">"Query"</p>
+                </div>
                 <div id="message"></div>
                 <div id="table-list"></div>
                 <div id="table-data"></div>
@@ -200,8 +203,11 @@
                     method: "POST",
                     body: formData
                 });
-                const message = await response.text();
-                document.getElementById("message").innerText = message;
+                const data = await response.json();
+                document.getElementById("message").innerText = data.message;
+                if (data.query) {
+                    document.getElementById("query-text").innerText = data.query;
+                }
                 updateDBInfo();
             });
         });

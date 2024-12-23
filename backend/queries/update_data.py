@@ -16,6 +16,6 @@ class UpdateDataQuery:
                 query = f"UPDATE {self.table_name} SET {target_data} WHERE {self.condition_column} = '{self.condition_value}'"
                 c.execute(text(query))
                 c.commit()
-            return "Succeed: Data Updated"
+            return "Succeed: Data Updated", query
         except Exception:
-            return f"Failed: Data Unupdated"
+            return f"Failed: Data Unupdated", None

@@ -12,6 +12,6 @@ class CreateTableQuery:
                 column_defs = [f"{name} {type}" for name, type in self.columns]
                 query = f"CREATE TABLE {self.table_name} ({', '.join(column_defs)});"
                 c.execute(text(query))
-            return "Succeed: Created Table"
+            return "Succeed: Created Table", query
         except Exception:
-            return "Failed: Uncreated Table"
+            return "Failed: Uncreated Table", None

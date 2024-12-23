@@ -10,6 +10,6 @@ class DropTableQuery:
             with self.db_engine.connect() as c:
                 query = f"DROP TABLE {self.table_name}"
                 c.execute(text(query))
-            return f"Succeed: Dropped Table {self.table_name}"
+            return f"Succeed: Dropped Table {self.table_name}", query
         except Exception:
-            return f"Failed: Undropped Table {self.table_name}"
+            return f"Failed: Undropped Table {self.table_name}", None
