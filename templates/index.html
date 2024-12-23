@@ -71,6 +71,36 @@
                 <button type="button" onclick="addTargetUpdate()">Add Target Data</button>
                 <button type="submit">Update Data</button>
             </form>
+
+            <form method="POST" action="{{ url_for('delete_data') }}">
+                <input type="text" id="tableNameInput" name="tableNameInput" placeholder="Table Name to Delete Data">
+                <div id="deleteConditions">
+                    <div class="deleteCondition">
+                        <input type="text" name="columnInput" placeholder="Column Name">
+                        <select name="operatorInput">
+                            <option value="=">=</option>
+                            <option value="<"><</option>
+                            <option value=">">></option>
+                            <option value="<="><=</option>
+                            <option value=">=">>=</option>
+                            <option value="!=">!=</option>
+                            <option value="LIKE">LIKE</option>
+                            <option value="IN">IN</option>
+                            <option value="NOT IN">NOT IN</option>
+                            <option value="BETWEEN">BETWEEN</option>
+                            <option value="IS NULL">IS NULL</option>
+                            <option value="IS NOT NULL">IS NOT NULL</option>
+                        </select>
+                        <input type="text" name="valueInput" placeholder="Value">
+                        <select name="logicalOperatorInput">
+                            <option value="AND">AND</option>
+                            <option value="OR">OR</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="button" onclick="addCondition()">Add Condition</button>
+                <button type="submit">Delete Data</button>
+            </form>
         </div>
         <div class="right-panel">
             <div id="db-info">
@@ -129,19 +159,53 @@
         }
 
         function addTargetUpdate() {
-            const rowDiv = document.createElement("div");
-            rowDiv.classList.add("dataUpdate");
-            rowDiv.innerHTML = `
+            const dataUpdateDiv = document.createElement("div");
+            dataUpdateDiv.classList.add("dataUpdate");
+            dataUpdateDiv.innerHTML = `
                 <input type="text" name="targetColInput" placeholder="Target Column">
                 <input type="text" name="targetValueInput" placeholder="Target Value">
                 <button type="button" onclick="deleteTargetUpdate(this)">Delete</button>
             `;
-            document.getElementById("dataUpdates").appendChild(rowDiv);
+            document.getElementById("dataUpdates").appendChild(dataUpdateDiv);
         }
 
         function deleteTargetUpdate(button) {
             const dataUpdateDiv = button.parentElement;
             dataUpdateDiv.remove();
+        }
+
+        function addCondition() {
+            const deleteConditionDiv = document.createElement("div");
+            deleteConditionDiv.classList.add("deleteCondition");
+            deleteConditionDiv.innerHTML = `
+                <input type="text" name="columnInput" placeholder="Column Name">
+                <select name="operatorInput">
+                    <option value="=">=</option>
+                    <option value="<"><</option>
+                    <option value=">">></option>
+                    <option value="<="><=</option>
+                    <option value=">=">>=</option>
+                    <option value="!=">!=</option>
+                    <option value="LIKE">LIKE</option>
+                    <option value="IN">IN</option>
+                    <option value="NOT IN">NOT IN</option>
+                    <option value="BETWEEN">BETWEEN</option>
+                    <option value="IS NULL">IS NULL</option>
+                    <option value="IS NOT NULL">IS NOT NULL</option>
+                </select>
+                <input type="text" name="valueInput" placeholder="Value">
+                <select name="logicalOperatorInput">
+                    <option value="AND">AND</option>
+                    <option value="OR">OR</option>
+                </select>
+                <button type="button" onclick="deleteCondition(this)">Delete</button>
+            `;
+            document.getElementById("deleteConditions").appendChild(deleteConditionDiv);
+        }
+
+        function deleteCondition(button) {
+            const conditionDiv = button.parentElement;
+            conditionDiv.remove();
         }
 
         async function updateDBInfo() {

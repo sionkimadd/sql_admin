@@ -70,7 +70,7 @@ h3 {
 
 .highlight {
     color: white;
-  }
+}
 
 form {
     display: flex;
@@ -161,6 +161,22 @@ input:focus, textarea:focus, select:focus {
     justify-content: center;
 }
 
+#deleteConditions {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#deleteConditions .deleteCondition {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
 button {
     width: 50%;
     text-align: center;
@@ -214,6 +230,7 @@ button:hover::after {
 #query-display #query-text {
     width: 70%;
     height: 4rem;
+    padding: 0.5rem;
     display: flex;
     flex-direction: column;
     justify-content: center;

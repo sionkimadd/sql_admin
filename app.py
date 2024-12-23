@@ -1,3 +1,4 @@
+import re
 from flask import Flask, request, render_template, jsonify
 from backend import *
 from sqlalchemy import inspect, text
@@ -168,6 +169,47 @@ def update_data():
     
     update_data_query = UpdateDataQuery(db_engine, table_name, condition_column, condition_value, target_columns, target_values)
     message, query = update_data_query.execute()
+    return jsonify({"message": message, "query": query})
+
+@app.route("/delete_data", methods=["POST"])
+def delete_data():
+    table_name = request.form.get("tableNameInput")
+    columns = request.form.getlist("columnInput")
+    operators = request.form.getlist("operatorInput")
+    values = request.form.getlist("valueInput")
+    logical_operators = request.form.getlist("logicalOperatorInput")
+
+    if not table_name or not table_name.strip():
+        return jsonify({"message": "Failed: Undefined Table Name", "query": None})
+    
+    if not columns or any(not column.strip() for column in columns):
+        return jsonify({"message": "Failed: Undefined Columns", "query": None})
+    
+    if not operators or any(not operator.strip() for operator in operators):
+        return jsonify({"message": "Failed: Undefined Operators", "query": None})
+    
+    if not values or any(not value.strip() for value in values):
+        return jsonify({"message": "Failed: Undefined Values", "query": None})
+    
+    conditions = []
+    for i, (column, operator, value) in enumerate(zip(columns, operators, values)):
+        if operator == "BETWEEN":
+            value1, value2 = re.split(r"\sand\s", value, flags=re.IGNORECASE)
+            condition = f"{column} BETWEEN {value1} AND {value2}"
+        elif operator in ["IN", "NOT IN"]:
+            values_list = ", ".join([f"{element .strip()}" for element  in value.split(",")])
+            condition = f"{column} {operator} ({values_list})"
+        elif operator == "IS NULL":
+            condition = f"{column} IS NULL"
+        elif operator == "IS NOT NULL":
+            condition = f"{column} IS NOT NULL"
+        else:
+            condition = f"{column} {operator} {value}"
+        conditions.append(condition)
+        conditions.append(logical_operators[i])
+    conditions.pop()
+    delete_data_query = DeleteDataQuery(db_engine, table_name, conditions)
+    message, query = delete_data_query.execute()
     return jsonify({"message": message, "query": query})
 
 if __name__ == "__main__":
