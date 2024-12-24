@@ -212,5 +212,26 @@ def delete_data():
     message, query = delete_data_query.execute()
     return jsonify({"message": message, "query": query})
 
+@app.route("/modify_table", methods=["POST"])
+def modify_table():
+    table_name = request.form.get("tableNameInput")
+    command = request.form.get("commandInput")
+    column_name = request.form.get("columnNameInput")
+    column_type = request.form.get("columnTypeInput")
+    column_new_name = request.form.get("columnNewNameInput")
+
+    if not table_name or not table_name.strip():
+        return jsonify({"message": "Failed: Undefined Table Name", "query": None})
+    
+    if not command or not command.strip():
+        return jsonify({"message": "Failed: Undefined Command", "query": None})
+    
+    if not column_name or not column_name.strip():
+        return jsonify({"message": "Failed: Undefined Column Name", "query": None})
+    
+    modify_table_query = ModifyTableQuery(db_engine, table_name, command, column_name, column_type, column_new_name)
+    message, query = modify_table_query.execute()
+    return jsonify({"message": message, "query": query})
+
 if __name__ == "__main__":
     app.run(debug=True)

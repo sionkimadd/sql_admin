@@ -108,6 +108,30 @@
                 <button type="button" onclick="addCondition()">Add Condition</button>
                 <button type="submit">Delete Data</button>
             </form>
+
+            <form method="POST" action="{{ url_for('modify_table') }}">
+                <label>MODIFY</label>
+                <input type="text" id="tableNameInput" name="tableNameInput" placeholder="Table Name to Modify">
+                <select name="commandInput">
+                    <option value="ADD">ADD</option>
+                    <option value="MODIFY">MODIFY</option>
+                    <option value="DROP">DROP</option>
+                    <option value="RENAME">RENAME</option>
+                </select>
+                <input type="text" name="columnNameInput" placeholder="Column Name">
+                <select name="columnTypeInput">
+                    <option value="INT">Int</option>
+                    <option value="FLOAT">Float</option>
+                    <option value="CHAR(3)">CHAR(3)</option>
+                    <option value="VARCHAR(255)">Varchar(255)</option>
+                    <option value="TEXT">Text</option>
+                    <option value="DATE">Date</option>
+                    <option value="DATETIME">DateTime</option>
+                    <option value="BOOLEAN">Boolean</option>
+                </select>
+                <input type="text" name="columnNewNameInput" placeholder="Column New Name">
+                <button type="submit">Modify Table</button>
+            </form>
         </div>
         <div class="right-panel">
             <div id="db-info">

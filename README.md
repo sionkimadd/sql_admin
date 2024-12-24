@@ -10,6 +10,7 @@
 - `Drop Table` 
 - `Insert Data`
 - `Update Data`
-- `Deleete Data`
+- `Delete Data`
+- `Modify Table`
 3. Flask ( )
 4. Deploy ( )

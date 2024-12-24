@@ -5,6 +5,7 @@ from .queries.drop_table import DropTableQuery
 from .queries.insert_data import InsertDataQuery
 from .queries.update_data import UpdateDataQuery
 from .queries.delete_data import DeleteDataQuery
+from .queries.modify_table import ModifyTableQuery
 
 __all__ = [ 
     "ConnectSQL",
@@ -13,5 +14,6 @@ __all__ = [
     "DropTableQuery",
     "InsertDataQuery",
     "UpdateDataQuery",
-    "DeleteDataQuery"
+    "DeleteDataQuery",
+    "ModifyTableQuery"
 ]
