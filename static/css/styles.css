@@ -88,6 +88,16 @@ label {
     color:white
 }
 
+.constraints {
+    padding: 1rem;
+    margin: 1rem 0;
+    border: 2px solid black;;
+}
+
+input[type="checkbox"] {
+    margin: 0;
+}
+
 .dispose_form {
     padding-top: 1rem;
 }

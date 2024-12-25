@@ -22,7 +22,6 @@ class ModifyTableQuery:
                     query = f"ALTER TABLE {self.table_name} RENAME COLUMN {self.column_name} TO {self.column_new_name}"
                 else:
                     return f"Failed: Wrong Command", None
-                print(query)
                 c.execute(text(query))
 
             return "Success: Modified Table", query

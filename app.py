@@ -48,8 +48,76 @@ def create_table():
     if not table_name or not column_names or not column_types:
         return jsonify({"message": "Failed: Undefined Table Name or Columns", "query": None})
 
-    columns = list(zip(column_names, column_types))
-    create_table_query = CreateTableQuery(db_engine, table_name, columns)
+    columns = []
+    foreign_keys = []
+    for i in range(len(column_names)):
+        constraints = request.form.getlist(f"columnConstraintsInput[{i}]")
+        constraint_strs = []
+        if "NOT NULL" in constraints:
+            constraint_strs.append("NOT NULL")
+        if "NULL" in constraints:
+            constraint_strs.append("NULL")
+        if "DEFAULT" in constraints:
+            default = request.form.get(f"defaultValueInput[{i}]")
+            constraint_strs.append(f"DEFAULT {default}")
+        if "UNIQUE" in constraints:
+            constraint_strs.append("UNIQUE")
+        if "PRIMARY KEY" in constraints:
+            constraint_strs.append("PRIMARY KEY")
+        if "AUTO_INCREMENT" in constraints:
+            constraint_strs.append("AUTO_INCREMENT")
+        if "FOREIGN KEY" in constraints:
+            foreign_table = request.form.get(f"foreignTableInput[{i}]")
+            foreign_column = request.form.get(f"foreignColumnInput[{i}]")
+            if foreign_table and foreign_column:
+                inspector = inspect(db_engine)
+                if foreign_table not in inspector.get_table_names():
+                    return jsonify({"message": f"Failed: Referenced Table {foreign_table} Unexist", "query": None})
+                
+                columns_info = inspector.get_columns(foreign_table)
+                indexes = inspector.get_indexes(foreign_table)
+                primary_keys = inspector.get_pk_constraint(foreign_table)["constrained_columns"]
+                unique_keys = [index["column_names"] for index in indexes if index.get("unique", False)]
+
+                is_primary_key = foreign_column in primary_keys
+                is_indexed = any(index["column_names"] == [foreign_column] for index in indexes)
+                is_unique_key = [foreign_column] in unique_keys
+
+                is_valid_foreign_key = False
+                for col in columns_info:
+                    if col["name"] == foreign_column:
+                        if is_primary_key or is_indexed or is_unique_key:
+                            is_valid_foreign_key = True
+                            break
+
+                if not is_valid_foreign_key:
+                    return jsonify({
+                        "message": f"Failed: Referenced Column {foreign_column} in Table {foreign_table} without index, unique key, or primary key",
+                        "query": None
+                    })
+
+                foreign_keys.append(f"FOREIGN KEY ({column_names[i]}) REFERENCES {foreign_table}({foreign_column})")
+            else:
+                return jsonify({"message": f"Failed: Undefined Referenced Table or Column for foreign key in column {column_names[i]}", "query": None})
+        if "CHECK" in constraints:
+            check = request.form.get(f"checkValueInput[{i}]")
+            constraint_strs.append(f"CHECK ({check})")
+        if "ON UPDATE" in constraints:
+            on_update = request.form.get(f"onUpdateValueInput[{i}]")
+            constraint_strs.append(f"ON UPDATE {on_update}")
+        if "COMMENT" in constraints:
+            comment = request.form.get(f"commentValueInput[{i}]")
+            constraint_strs.append(f"COMMENT {comment}")
+        if "COLLATION" in constraints:
+            collation = request.form.get(f"collationValueInput[{i}]")
+            constraint_strs.append(f"COLLATE {collation}")
+        if "CHARACTER SET" in constraints:
+            character_set = request.form.get(f"characterSetValueInput[{i}]")
+            constraint_strs.append(f"CHARACTER SET {character_set}")
+        
+        columns.append((column_names[i], column_types[i], constraint_strs))
+
+    create_table_query = CreateTableQuery(db_engine, table_name, columns, foreign_keys)
     message, query = create_table_query.execute()
     return jsonify({"message": message, "query": query})
 
