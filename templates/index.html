@@ -39,28 +39,51 @@
                             <option value="BOOLEAN">Boolean</option>
                         </select>
                         <div class="constraints">
-                            <label><input type="checkbox" name="columnConstraintsInput[0]" value="NOT NULL">NOT NULL</label>
-                            <label><input type="checkbox" name="columnConstraintsInput[0]" value="NULL">NULL</label>
-                            <label><input type="checkbox" name="columnConstraintsInput[0]" value="DEFAULT">DEFAULT</label>
+                            <input type="checkbox" id="not-null-0" name="columnConstraintsInput[0]" value="NOT NULL">
+                            <label for="not-null-0" class="checkbox-label">NOT NULL</label>
+
+                            <input type="checkbox" id="null-0" name="columnConstraintsInput[0]" value="NULL">
+                            <label for="null-0" class="checkbox-label">NULL</label>
+
+                            <input type="checkbox" id="default-0" name="columnConstraintsInput[0]" value="DEFAULT">
+                            <label for="default-0" class="checkbox-label">DEFAULT</label>
                             <input type="text" name="defaultValueInput[0]" placeholder="Default Value">
-                            <label><input type="checkbox" name="columnConstraintsInput[0]" value="UNIQUE">UNIQUE</label>
-                            <label><input type="checkbox" name="columnConstraintsInput[0]" value="PRIMARY KEY">PRIMARY KEY</label>
-                            <label><input type="checkbox" name="columnConstraintsInput[0]" value="AUTO_INCREMENT">AUTO_INCREMENT</label>
-                            <label><input type="checkbox" name="columnConstraintsInput[0]" value="FOREIGN KEY">FOREIGN KEY</label>
+
+                            <input type="checkbox" id="unique-0" name="columnConstraintsInput[0]" value="UNIQUE">
+                            <label for="unique-0" class="checkbox-label">UNIQUE</label>
+
+                            <input type="checkbox" id="primary-key-0" name="columnConstraintsInput[0]" value="PRIMARY KEY">
+                            <label for="primary-key-0" class="checkbox-label">PRIMARY KEY</label>
+
+                            <input type="checkbox" id="auto-increment-0" name="columnConstraintsInput[0]" value="AUTO_INCREMENT">
+                            <label for="auto-increment-0" class="checkbox-label">AUTO_INCREMENT</label>
+
+                            <input type="checkbox" id="foreign-key-0" name="columnConstraintsInput[0]" value="FOREIGN KEY">
+                            <label for="foreign-key-0" class="checkbox-label">FOREIGN KEY</label>
                             <input type="text" name="foreignTableInput[0]" placeholder="Referenced Table">
                             <input type="text" name="foreignColumnInput[0]" placeholder="Referenced Column">
-                            <label><input type="checkbox" name="columnConstraintsInput[0]" value="CHECK">CHECK</label>
+
+                            <input type="checkbox" id="check-0" name="columnConstraintsInput[0]" value="CHECK">
+                            <label for="check-0" class="checkbox-label">CHECK</label>
                             <input type="text" name="checkValueInput[0]" placeholder="Check Condition">
-                            <label><input type="checkbox" name="columnConstraintsInput[0]" value="ON UPDATE">ON UPDATE</label>
+
+                            <input type="checkbox" id="on-update-0" name="columnConstraintsInput[0]" value="ON UPDATE">
+                            <label for="on-update-0" class="checkbox-label">ON UPDATE</label>
                             <input type="text" name="onUpdateValueInput[0]" placeholder="On Update Value">
-                            <label><input type="checkbox" name="columnConstraintsInput[0]" value="COMMENT">COMMENT</label>
+
+                            <input type="checkbox" id="comment-0" name="columnConstraintsInput[0]" value="COMMENT">
+                            <label for="comment-0" class="checkbox-label">COMMENT</label>
                             <input type="text" name="commentValueInput[0]" placeholder="Comment">
-                            <label><input type="checkbox" name="columnConstraintsInput[0]" value="COLLATION">COLLATION</label>
+
+                            <input type="checkbox" id="collation-0" name="columnConstraintsInput[0]" value="COLLATION">
+                            <label for="collation-0" class="checkbox-label">COLLATION</label>
                             <select name="collationValueInput[0]">
                                 <option value="utf8mb4_general_ci">utf8mb4_general_ci</option>
                                 <option value="utf8mb4_unicode_ci">utf8mb4_unicode_ci</option>
                             </select>
-                            <label><input type="checkbox" name="columnConstraintsInput[0]" value="CHARACTER SET">CHARACTER SET</label>
+
+                            <input type="checkbox" id="character-set-0" name="columnConstraintsInput[0]" value="CHARACTER SET">
+                            <label for="character-set-0" class="checkbox-label">CHARACTER SET</label>
                             <select name="characterSetValueInput[0]">
                                 <option value="utf8mb4">utf8mb4</option>
                                 <option value="latin1">latin1</option>
@@ -194,28 +217,51 @@
                     <option value="BOOLEAN">Boolean</option>
                 </select>
                 <div class="constraints">
-                    <label><input type="checkbox" name="columnConstraintsInput[${columnIndex}]" value="NOT NULL">NOT NULL</label>
-                    <label><input type="checkbox" name="columnConstraintsInput[${columnIndex}]" value="NULL">NULL</label>
-                    <label><input type="checkbox" name="columnConstraintsInput[${columnIndex}]" value="DEFAULT">DEFAULT</label>
+                    <input type="checkbox" id="not-null-${columnIndex}" name="columnConstraintsInput[${columnIndex}]" value="NOT NULL">
+                    <label for="not-null-${columnIndex}" class="checkbox-label">NOT NULL</label>
+
+                    <input type="checkbox" id="null-${columnIndex}" name="columnConstraintsInput[${columnIndex}]" value="NULL">
+                    <label for="null-${columnIndex}" class="checkbox-label">NULL</label>
+
+                    <input type="checkbox" id="default-${columnIndex}" name="columnConstraintsInput[${columnIndex}]" value="DEFAULT">
+                    <label for="default-${columnIndex}" class="checkbox-label">DEFAULT</label>
                     <input type="text" name="defaultValueInput[${columnIndex}]" placeholder="Default Value">
-                    <label><input type="checkbox" name="columnConstraintsInput[${columnIndex}]" value="UNIQUE">UNIQUE</label>
-                    <label><input type="checkbox" name="columnConstraintsInput[${columnIndex}]" value="PRIMARY KEY">PRIMARY KEY</label>
-                    <label><input type="checkbox" name="columnConstraintsInput[${columnIndex}]" value="AUTO_INCREMENT">AUTO_INCREMENT</label>
-                    <label><input type="checkbox" name="columnConstraintsInput[${columnIndex}]" value="FOREIGN KEY">FOREIGN KEY</label>
+
+                    <input type="checkbox" id="unique-${columnIndex}" name="columnConstraintsInput[${columnIndex}]" value="UNIQUE">
+                    <label for="unique-${columnIndex}" class="checkbox-label">UNIQUE</label>
+
+                    <input type="checkbox" id="primary-key-${columnIndex}" name="columnConstraintsInput[${columnIndex}]" value="PRIMARY KEY">
+                    <label for="primary-key-${columnIndex}" class="checkbox-label">PRIMARY KEY</label>
+
+                    <input type="checkbox" id="auto-increment-${columnIndex}" name="columnConstraintsInput[${columnIndex}]" value="AUTO_INCREMENT">
+                    <label for="auto-increment-${columnIndex}" class="checkbox-label">AUTO_INCREMENT</label>
+
+                    <input type="checkbox" id="foreign-key-${columnIndex}" name="columnConstraintsInput[${columnIndex}]" value="FOREIGN KEY">
+                    <label for="foreign-key-${columnIndex}" class="checkbox-label">FOREIGN KEY</label>
                     <input type="text" name="foreignTableInput[${columnIndex}]" placeholder="Referenced Table">
                     <input type="text" name="foreignColumnInput[${columnIndex}]" placeholder="Referenced Column">
-                    <label><input type="checkbox" name="columnConstraintsInput[${columnIndex}]" value="CHECK">CHECK</label>
+
+                    <input type="checkbox" id="check-${columnIndex}" name="columnConstraintsInput[${columnIndex}]" value="CHECK">
+                    <label for="check-${columnIndex}" class="checkbox-label">CHECK</label>
                     <input type="text" name="checkValueInput[${columnIndex}]" placeholder="Check Condition">
-                    <label><input type="checkbox" name="columnConstraintsInput[${columnIndex}]" value="ON UPDATE">ON UPDATE</label>
+
+                    <input type="checkbox" id="on-update-${columnIndex}" name="columnConstraintsInput[${columnIndex}]" value="ON UPDATE">
+                    <label for="on-update-${columnIndex}" class="checkbox-label">ON UPDATE</label>
                     <input type="text" name="onUpdateValueInput[${columnIndex}]" placeholder="On Update Value">
-                    <label><input type="checkbox" name="columnConstraintsInput[${columnIndex}]" value="COMMENT">COMMENT</label>
+
+                    <input type="checkbox" id="comment-${columnIndex}" name="columnConstraintsInput[${columnIndex}]" value="COMMENT">
+                    <label for="comment-${columnIndex}" class="checkbox-label">COMMENT</label>
                     <input type="text" name="commentValueInput[${columnIndex}]" placeholder="Comment">
-                    <label><input type="checkbox" name="columnConstraintsInput[${columnIndex}]" value="COLLATION">COLLATION</label>
+
+                    <input type="checkbox" id="collation-${columnIndex}" name="columnConstraintsInput[${columnIndex}]" value="COLLATION">
+                    <label for="collation-${columnIndex}" class="checkbox-label">COLLATION</label>
                     <select name="collationValueInput[${columnIndex}]">
                         <option value="utf8mb4_general_ci">utf8mb4_general_ci</option>
                         <option value="utf8mb4_unicode_ci">utf8mb4_unicode_ci</option>
                     </select>
-                    <label><input type="checkbox" name="columnConstraintsInput[${columnIndex}]" value="CHARACTER SET">CHARACTER SET</label>
+
+                    <input type="checkbox" id="character-set-${columnIndex}" name="columnConstraintsInput[${columnIndex}]" value="CHARACTER SET">
+                    <label for="character-set-${columnIndex}" class="checkbox-label">CHARACTER SET</label>
                     <select name="characterSetValueInput[${columnIndex}]">
                         <option value="utf8mb4">utf8mb4</option>
                         <option value="latin1">latin1</option>
@@ -235,13 +281,39 @@
         function reindexColumns() {
             const columns = document.querySelectorAll(".column");
             columns.forEach((column, index) => {
-                const constraints = column.querySelectorAll(".constraints input, .constraints select");
+                const constraints = column.querySelectorAll(".constraints input, .constraints select, .constraints label");
                 constraints.forEach(constraint => {
-                    const name = constraint.name;
-                    const baseName = name.substring(0, name.indexOf("["));
-                    constraint.name = `${baseName}[${index}]`;
+                    if (constraint.tagName === "INPUT") {
+                        updateNameAndId(constraint, index);
+                    }
+                    if (constraint.tagName === "SELECT") {
+                        updateNameAndId(constraint, index);
+                    }
+                    if (constraint.tagName === "LABEL") {
+                        updateFor(constraint, index);
+                    }
                 });
             });
+        }
+
+        function updateNameAndId(constraint, index) {
+            const name = constraint.name;
+            const nameBase = name.substring(0, name.indexOf("["));
+            constraint.name = `${nameBase}[${index}]`;
+
+            if (constraint.type === "checkbox") {
+                const id = constraint.id;
+                const idBase = id.substring(0, id.lastIndexOf("-"));
+                constraint.id = `${idBase}-${index}`;
+            }
+        }
+
+        function updateFor(label, index) {
+            const labelFor = label.htmlFor;
+            if (labelFor) {
+                const labelForBase = labelFor.substring(0, labelFor.lastIndexOf("-"));
+                label.htmlFor = `${labelForBase}-${index}`;
+            }
         }
 
         function addRow() {

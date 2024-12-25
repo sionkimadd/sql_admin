@@ -89,13 +89,39 @@ label {
 }
 
 .constraints {
-    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem 0;
     margin: 1rem 0;
+    padding-bottom: 0;
     border: 2px solid black;;
 }
 
-input[type="checkbox"] {
+.constraints input[type="text"] {
+    width: 70%;
     margin: 0;
+    margin-bottom: 2rem;
+}
+
+.constraints select {
+    width: 70%;
+    margin: 0;
+    margin-bottom: 2rem;
+}
+
+.checkbox-label {
+    margin-bottom: 2rem;
+    font-size: 1rem;
+    color: white;
+}
+
+input[type="checkbox"]:checked + label.checkbox-label {
+    color: blue;
+}
+
+input[type="checkbox"] {
+    display: none;
 }
 
 .dispose_form {
