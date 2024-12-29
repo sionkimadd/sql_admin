@@ -183,6 +183,43 @@
                 <input type="text" name="columnNewNameInput" placeholder="Column New Name">
                 <button type="submit">Modify Table</button>
             </form>
+
+            <form class="join-form" id="joinForm" method="POST" action="{{ url_for('join_table') }}">
+                <label>JOIN</label>
+                <input type="text" id="tableNameInput" name="tableNameInput" placeholder="Table Name to Base">
+
+                <div id="join-tables">
+                    <div class="join-table">
+                        <select name="joinTypes">
+                            <option value="INNER">INNER JOIN</option>
+                            <option value="LEFT">LEFT JOIN</option>
+                            <option value="RIGHT">RIGHT JOIN</option>
+                            <option value="FULL">FULL JOIN</option>
+                            <option value="CROSS">CROSS JOIN</option>
+                            <option value="SELF">SELF JOIN</option>
+                        </select>
+                        <input type="text" name="joinTables" placeholder="Join Table">
+                        <input type="text" name="joinConditions" placeholder="ON Condition e.g. table1.column = table2.column">
+                    </div>
+                </div>
+                <button type="button" onclick="addJoin()">Add JOIN</button>
+
+                <div id="select-columns">
+                    <div class="select-column">
+                        <input type="text" name="selectColumns" placeholder="Select Column e.g. table1.column">
+                    </div>
+                </div>
+                <button type="button" onclick="addSelectColumn()">Add Select Column</button>
+
+                <div id="where-conditions">
+                    <div class="where-condition">
+                        <input type="text" name="whereConditions" placeholder="WHERE Condition e.g. table.column > 100">
+                    </div>
+                </div>
+                <button type="button" onclick="addWhereCondition()">Add WHERE Conidtion</button>
+
+                <button type="submit">Join Table</button>
+            </form>
         </div>
         <div class="right-panel">
             <div id="db-info">
@@ -194,11 +231,66 @@
                 <div id="message"></div>
                 <div id="table-list"></div>
                 <div id="table-data"></div>
+                <div id="join-output"></div>
             </div>
         </div>
     </div>
     
     <script>
+        function addJoin() {
+            const joinTableDiv = document.createElement("div");
+            joinTableDiv.classList.add("join-table");
+            joinTableDiv.innerHTML = `
+                <select name="joinTypes">
+                    <option value="INNER">INNER JOIN</option>
+                    <option value="LEFT">LEFT JOIN</option>
+                    <option value="RIGHT">RIGHT JOIN</option>
+                    <option value="FULL">FULL JOIN</option>
+                    <option value="CROSS">CROSS JOIN</option>
+                    <option value="SELF">SELF JOIN</option>
+                </select>
+                <input type="text" name="joinTables" placeholder="Join Table">
+                <input type="text" name="joinConditions" placeholder="ON Condition e.g. table1.column = table2.column">
+                <button type="button" onclick="deleteJoinTable(this)">Delete</button>
+            `;
+            document.getElementById("join-tables").appendChild(joinTableDiv);
+        }
+
+        function deleteJoinTable(button) {
+            const joinTableDiv = button.parentElement;
+            joinTableDiv.remove();
+        }
+
+        function addSelectColumn() {
+            const selectColumnDiv = document.createElement("div");
+            selectColumnDiv.classList.add("select-column");
+            selectColumnDiv.innerHTML = `
+                <input type="text" name="selectColumns" placeholder="Select Column e.g. table.column">
+                <button type="button" onclick="deleteSelectColumn(this)">Delete</button>
+            `;
+            document.getElementById("select-columns").appendChild(selectColumnDiv);
+        }
+
+        function deleteSelectColumn(button) {
+            const selectColumnDiv = button.parentElement;
+            selectColumnDiv.remove();
+        }
+
+        function addWhereCondition() {
+            const joinWhereConditionDiv = document.createElement("div");
+            joinWhereConditionDiv.classList.add("where-condition");
+            joinWhereConditionDiv.innerHTML = `
+                <input type="text" name="whereConditions" placeholder="WHERE Condition e.g. table.column > 100">
+                <button type="button" onclick="deleteJoinWhereCondition(this)">Delete</button>
+            `;
+            document.getElementById("where-conditions").appendChild(joinWhereConditionDiv);
+        }
+
+        function deleteJoinWhereCondition(button) {
+            const joinWhereConditionDiv = button.parentElement;
+            joinWhereConditionDiv.remove();
+        }
+
         function addColumn() {
             const columnDiv = document.createElement("div");
             columnDiv.classList.add("column");
@@ -434,22 +526,79 @@
         }
 
         document.querySelectorAll("form").forEach((form) => {
-            form.addEventListener("submit", async function (event) {
-                event.preventDefault();
-                const formData = new FormData(form);
-                const response = await fetch(form.action, {
-                    method: "POST",
-                    body: formData
+            if (form.id !== "joinForm") {
+                form.addEventListener("submit", async function (event) {
+                    event.preventDefault();
+                    const formData = new FormData(form);
+                    const response = await fetch(form.action, {
+                        method: "POST",
+                        body: formData
+                    });
+                    const data = await response.json();
+                    document.getElementById("message").innerText = data.message;
+                    if (data.query) {
+                        document.getElementById("query-text").innerText = data.query;
+                    }
+                    updateDBInfo();
                 });
-                const data = await response.json();
-                document.getElementById("message").innerText = data.message;
-                if (data.query) {
-                    document.getElementById("query-text").innerText = data.query;
-                }
-                updateDBInfo();
-            });
+            }
         });
         updateDBInfo();
+
+        document.getElementById("joinForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const response = await fetch(this.action, {
+                method: "POST",
+                body: formData
+            });
+            const data = await response.json();
+            document.getElementById("message").innerText = data.message;
+            if (data.query) {
+                document.getElementById("query-text").innerText = data.query;
+            }
+            if (data.rows && data.column_names) {
+                displayQueryResults(data.rows, data.column_names);
+            }
+        });
+
+        function displayQueryResults(rows, column_names) {
+            const tableDataDiv = document.getElementById("join-output");
+            tableDataDiv.innerHTML = "";
+            const tableTag = document.createElement("table");
+            const theadTag = document.createElement("thead");
+            const tbodyTag = document.createElement("tbody");
+
+            const headerRow = document.createElement("tr");
+            column_names.forEach(columnName => {
+                const thTag = document.createElement("th");
+                thTag.innerText = columnName;
+                headerRow.appendChild(thTag);
+            });
+            theadTag.appendChild(headerRow);
+            tableTag.appendChild(theadTag);
+
+            if (rows.length > 0) {
+                rows.forEach(row => {
+                    const trTag = document.createElement("tr");
+                    column_names.forEach(columnName => {
+                        const tdTag = document.createElement("td");
+                        tdTag.innerText = row[columnName];
+                        trTag.appendChild(tdTag);
+                    });
+                    tbodyTag.appendChild(trTag);
+                });
+            } else {
+                const trNoDataTag = document.createElement("tr");
+                const tdNoDataTag = document.createElement("td");
+                tdNoDataTag.colSpan = column_names.length;
+                tdNoDataTag.innerText = "No Data";
+                trNoDataTag.appendChild(tdNoDataTag);
+                tbodyTag.appendChild(trNoDataTag);
+            }
+            tableTag.appendChild(tbodyTag);
+            tableDataDiv.appendChild(tableTag);
+        }
     </script>
 </body>
 </html>

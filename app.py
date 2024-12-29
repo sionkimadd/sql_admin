@@ -301,5 +301,39 @@ def modify_table():
     message, query = modify_table_query.execute()
     return jsonify({"message": message, "query": query})
 
+@app.route("/join_table", methods=["POST"])
+def join_table():
+    table_name = request.form.get("tableNameInput")
+    join_types = request.form.getlist("joinTypes")
+    join_tables = request.form.getlist("joinTables")
+    join_conditions = request.form.getlist("joinConditions")
+    select_columns = request.form.getlist("selectColumns")
+    where_conditions = request.form.getlist("whereConditions")
+    
+    if not table_name or not table_name.strip():
+        return jsonify({"message": "Failed: Undefined Table Name", "query": None})
+    
+    if not join_types or any(not join_type.strip() for join_type in join_types):
+        return jsonify({"message": "Failed: Undefined Join Types", "query": None})
+    
+    if not join_tables or any(not join_table.strip() for join_table in join_tables):
+        return jsonify({"message": "Failed: Undefined Join Tables", "query": None})
+
+    if not join_conditions or any(not join_condition.strip() for join_condition in join_conditions):
+        return jsonify({"message": "Failed: Undefined Join Conditions", "query": None})
+
+    if not select_columns or any(not select_column.strip() for select_column in select_columns):
+        return jsonify({"message": "Failed: Undefined Select Columns", "query": None})
+
+    join_query = JoinTableQuery(db_engine, table_name, join_types, join_tables, join_conditions, select_columns, where_conditions)
+    message, query, rows, column_names = join_query.execute()
+    
+    return jsonify({
+        "message": message,
+        "query": query,
+        "rows": [dict(row._mapping) for row in rows],
+        "column_names": column_names
+    })
+
 if __name__ == "__main__":
     app.run(debug=True)
