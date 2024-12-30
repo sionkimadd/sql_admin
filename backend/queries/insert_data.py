@@ -10,21 +10,21 @@ class InsertDataQuery:
     def execute(self):
         try:
             with self.db_engine.connect() as c:
-                columns_str = ", ".join(self.column_names)
-                values_list = []
-                for row in self.data:
-                    parsed_values = []
-                    for value in row.values():
-                        if value is None or value == "":
-                            parsed_values.append("NULL")
-                        else:
-                            parsed_values.append(f"'{value}'")
-                    row_str = ", ".join(parsed_values)
-                    values_list.append(f"({row_str})")
-                values_str = ", ".join(values_list)
-                query = f"INSERT INTO {self.table_name} ({columns_str}) VALUES {values_str}"
-                c.execute(text(query))
-                c.commit()
+                with c.begin():
+                    columns_str = ", ".join(self.column_names)
+                    values_list = []
+                    for row in self.data:
+                        parsed_values = []
+                        for value in row.values():
+                            if value is None or value == "":
+                                parsed_values.append("NULL")
+                            else:
+                                parsed_values.append(f"'{value}'")
+                        row_str = ", ".join(parsed_values)
+                        values_list.append(f"({row_str})")
+                    values_str = ", ".join(values_list)
+                    query = f"INSERT INTO {self.table_name} ({columns_str}) VALUES {values_str}"
+                    c.execute(text(query))
                 
             return "Succeed: Inserted Data", query
         except Exception:

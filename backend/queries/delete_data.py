@@ -9,11 +9,12 @@ class DeleteDataQuery:
     def execute(self):
         try:
             with self.db_engine.connect() as c:
-                condition_str = " ".join(self.conditions)
-                query = f"DELETE FROM {self.table_name} WHERE {condition_str}"
-                output = c.execute(text(query))
-                rows_deleted = output.rowcount
-                c.commit()
+                with c.begin():
+                    condition_str = " ".join(self.conditions)
+                    query = f"DELETE FROM {self.table_name} WHERE {condition_str}"
+                    output = c.execute(text(query))
+                    rows_deleted = output.rowcount
+
                 if rows_deleted > 0:
                     return f"Succeed: Deleted {rows_deleted} Row(s)", query
                 else:
