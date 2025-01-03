@@ -335,5 +335,34 @@ def join_table():
         "column_names": column_names
     })
 
+@app.route("/sorting_table", methods=["POST"])
+def sorting_table():
+    table_name = request.form.get("tableNameInput")
+    order_columns = request.form.getlist("orderColumnNameInput")
+    order_sortings = request.form.getlist("sortingInput")
+    select_columns = request.form.getlist("selectColumnNameInput")
+
+    if not table_name or not table_name.strip():
+        return jsonify({"message": "Failed: Undefined Table Name", "query": None})
+
+    if not order_columns or any(not column.strip() for column in order_columns):
+        return jsonify({"message": "Failed: Undefined Order Columns", "query": None})
+
+    if not order_sortings or any(not sorting.strip() for sorting in order_sortings):
+        return jsonify({"message": "Failed: Undefined Order Sortings", "query": None})
+
+    if not select_columns or any(not column.strip() for column in select_columns):
+        return jsonify({"message": "Failed: Undefined Select Columns", "query": None})
+
+    sorting_query = SortingTableQuery(db_engine, table_name, order_columns, order_sortings, select_columns)
+    message, query, rows, column_names = sorting_query.execute()
+
+    return jsonify({
+        "message": message,
+        "query": query,
+        "rows": [dict(row._mapping) for row in rows],
+        "column_names": column_names
+    })
+
 if __name__ == "__main__":
     app.run(debug=True)

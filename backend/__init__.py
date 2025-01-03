@@ -7,6 +7,7 @@ from .queries.update_data import UpdateDataQuery
 from .queries.delete_data import DeleteDataQuery
 from .queries.modify_table import ModifyTableQuery
 from .queries.join_table import JoinTableQuery
+from .queries.sorting_table import SortingTableQuery
 
 __all__ = [ 
     "ConnectSQL",
@@ -17,5 +18,6 @@ __all__ = [
     "UpdateDataQuery",
     "DeleteDataQuery",
     "ModifyTableQuery",
-    "JoinTableQuery"
+    "JoinTableQuery",
+    "SortingTableQuery"
 ]

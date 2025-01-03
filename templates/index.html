@@ -220,6 +220,31 @@
 
                 <button type="submit">Join Table</button>
             </form>
+
+            <form class="sorting-form" id="sortingForm" method="POST" action="{{ url_for('sorting_table') }}">
+                <label>SORTING</label>
+                <input type="text" id="tableNameInput" name="tableNameInput" placeholder="Table Name to Sorting">
+                
+                <div id="sorting-elements">
+                    <div class="sorting-element">
+                        <input type="text" name="orderColumnNameInput" placeholder="Order by Column Name">
+                        <select name="sortingInput">
+                            <option value="ASC">ASC</option>
+                            <option value="DESC">DESC</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="button" onclick="addSortingElementColumn()">Add Order Element</button>
+
+                <div id="select-sorting-columns">
+                    <div class="select-sorting-column">
+                        <input type="text" name="selectColumnNameInput" placeholder="Select Column Name">
+                    </div>
+                </div>
+                <button type="button" onclick="addSelectSortingColumn()">Add Select Column</button>
+
+                <button type="submit">Sort Table</button>
+            </form>
         </div>
         <div class="right-panel">
             <div id="db-info">
@@ -232,6 +257,7 @@
                 <div id="table-list"></div>
                 <div id="table-data"></div>
                 <div id="join-output"></div>
+                <div id="sorting-output"></div>
             </div>
         </div>
     </div>
@@ -474,6 +500,40 @@
             conditionDiv.remove();
         }
 
+        function addSortingElementColumn() {
+            const sortingElementDiv = document.createElement("div");
+            sortingElementDiv.classList.add("sorting-element");
+            sortingElementDiv.innerHTML = `
+                <input type="text" name="orderColumnNameInput" placeholder="Order by Column Name">
+                <select name="sortingInput">
+                    <option value="ASC">ASC</option>
+                    <option value="DESC">DESC</option>
+                </select>
+                <button type="button" onclick="deleteSortingElementColumn(this)">Delete</button>
+            `;
+            document.getElementById("sorting-elements").appendChild(sortingElementDiv);
+        }
+
+        function deleteSortingElementColumn(button) {
+            const sortingElementDiv = button.parentElement;
+            sortingElementDiv.remove();
+        }
+
+        function addSelectSortingColumn() {
+            const selectSortingColumnDiv = document.createElement("div");
+            selectSortingColumnDiv.classList.add("select-sorting-column");
+            selectSortingColumnDiv.innerHTML = `
+                <input type="text" name="selectColumnNameInput" placeholder="Select Column Name">
+                <button type="button" onclick="deleteSelectSortingColumn(this)">Delete</button>
+            `;
+            document.getElementById("select-sorting-columns").appendChild(selectSortingColumnDiv);
+        }
+
+        function deleteSelectSortingColumn(button) {
+            const selectSortingColumnDiv = button.parentElement;
+            selectSortingColumnDiv.remove();
+        }
+        
         async function updateDBInfo() {
             const response = await fetch("{{ url_for('get_db_info') }}");
             const data = await response.json();
@@ -526,7 +586,7 @@
         }
 
         document.querySelectorAll("form").forEach((form) => {
-            if (form.id !== "joinForm") {
+            if (form.id !== "joinForm" || form.id !== "sortingForm") {
                 form.addEventListener("submit", async function (event) {
                     event.preventDefault();
                     const formData = new FormData(form);
@@ -599,6 +659,62 @@
             tableTag.appendChild(tbodyTag);
             tableDataDiv.appendChild(tableTag);
         }
+
+        document.getElementById("sortingForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const response = await fetch(this.action, {
+                method: "POST",
+                body: formData
+            });
+            const data = await response.json();
+            document.getElementById("message").innerText = data.message;
+            if (data.query) {
+                document.getElementById("query-text").innerText = data.query;
+            }
+            if (data.rows && data.column_names) {
+                displaySortingResults(data.rows, data.column_names);
+            }
+        });
+
+        function displaySortingResults(rows, column_names) {
+            const tableDataDiv = document.getElementById("sorting-output");
+            tableDataDiv.innerHTML = "";
+            const tableTag = document.createElement("table");
+            const theadTag = document.createElement("thead");
+            const tbodyTag = document.createElement("tbody");
+
+            const headerRow = document.createElement("tr");
+            column_names.forEach(columnName => {
+                const thTag = document.createElement("th");
+                thTag.innerText = columnName;
+                headerRow.appendChild(thTag);
+            });
+            theadTag.appendChild(headerRow);
+            tableTag.appendChild(theadTag);
+
+            if (rows.length > 0) {
+                rows.forEach(row => {
+                    const trTag = document.createElement("tr");
+                    column_names.forEach(columnName => {
+                        const tdTag = document.createElement("td");
+                        tdTag.innerText = row[columnName];
+                        trTag.appendChild(tdTag);
+                    });
+                    tbodyTag.appendChild(trTag);
+                });
+            } else {
+                const trNoDataTag = document.createElement("tr");
+                const tdNoDataTag = document.createElement("td");
+                tdNoDataTag.colSpan = column_names.length;
+                tdNoDataTag.innerText = "No Data";
+                trNoDataTag.appendChild(tdNoDataTag);
+                tbodyTag.appendChild(trNoDataTag);
+            }
+            tableTag.appendChild(tbodyTag);
+            tableDataDiv.appendChild(tableTag);
+        }
+        
     </script>
 </body>
 </html>
