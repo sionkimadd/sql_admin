@@ -17,7 +17,7 @@ class JoinTableQuery:
                 for join_type, join_table, join_condition in zip(self.join_types, self.join_tables, self.join_conditions):
                     query += f" {join_type} JOIN {join_table} ON {join_condition}"
                 if self.where_conditions:
-                    query += f" WHERE {" AND ".join(self.where_conditions)}"
+                    query += f" WHERE {' AND '.join(self.where_conditions)}"
                 output = c.execute(text(query))
                 rows = output.fetchall()
                 column_names = list(output.keys())

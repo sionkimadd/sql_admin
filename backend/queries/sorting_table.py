@@ -16,7 +16,7 @@ class SortingTableQuery:
                 for col, sor in zip(self.order_columns, self.order_sortings):
                     order = f"{col} {sor}"
                     orders.append(order)
-                query += f" ORDER BY {", ".join(orders)}"
+                query += f" ORDER BY {', '.join(orders)}"
                 output = c.execute(text(query))
                 rows = output.fetchall()
                 column_names = list(output.keys())
