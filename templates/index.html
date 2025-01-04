@@ -245,6 +245,12 @@
 
                 <button type="submit">Sort Table</button>
             </form>
+
+            <form id="exportForm" method="POST" action="{{ url_for('export_table') }}">
+                <label>EXPORT</label>
+                <input type="text" id="exportTableNameInput" name="exportTableNameInput" placeholder="Table Name to Export">
+                <button type="submit">Export to Excel</button>
+            </form>
         </div>
         <div class="right-panel">
             <div id="db-info">
@@ -714,6 +720,36 @@
             tableTag.appendChild(tbodyTag);
             tableDataDiv.appendChild(tableTag);
         }
+        document.getElementById("exportForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+
+            try {
+                const response = await fetch(this.action, {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement("a");
+                    a.style.display = "none";
+                    a.href = url;
+                    a.download = `${formData.get("exportTableNameInput")}.xlsx`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                } else {
+                    const errorMessage = "Failed: Unexistent Table or Unexpected Error";
+                    document.getElementById("message").innerText = errorMessage;
+                }
+            } catch (error) {
+                const errorMessage = "Failed: Network Error";
+                document.getElementById("message").innerText = errorMessage;
+            }
+});
+
         
     </script>
 </body>

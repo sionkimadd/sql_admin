@@ -1,7 +1,9 @@
 import re
-from flask import Flask, request, render_template, jsonify
+from flask import Flask, request, render_template, jsonify, send_file
 from backend import *
 from sqlalchemy import inspect, text
+import pandas as pd
+import io
 
 app = Flask(__name__)
 
@@ -363,6 +365,34 @@ def sorting_table():
         "rows": [dict(row._mapping) for row in rows],
         "column_names": column_names
     })
+
+@app.route("/export_table", methods=["POST"])
+def export_table():
+    table_name = request.form.get("exportTableNameInput")
+    
+    if not table_name or not table_name.strip():
+        return jsonify({"message": "Failed: Undefined Table Name", "query": None})
+    
+    global db_engine
+    if db_engine:
+        with db_engine.connect() as c:
+            query = f"SELECT * FROM {table_name}"
+            output = c.execute(text(query))
+            df = pd.DataFrame(output.fetchall(), columns=output.keys())
+            
+            excel_data = io.BytesIO()
+            with pd.ExcelWriter(excel_data, engine = "xlsxwriter") as w:
+                df.to_excel(w, index=False, sheet_name=table_name)
+            excel_data.seek(0)
+            
+            return send_file(
+                excel_data,
+                download_name=f"{table_name}.xlsx",
+                as_attachment=True,
+                mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            )
+    else:
+        return jsonify({"message": "Failed: Deactivated DB", "query": None})
 
 if __name__ == "__main__":
     app.run(debug=True)
