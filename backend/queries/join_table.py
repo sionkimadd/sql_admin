@@ -13,7 +13,7 @@ class JoinTableQuery:
     def execute(self):
         try:
             with self.db_engine.connect() as c:
-                query = f"SELECT {", ".join(self.select_columns)} FROM {self.table_name}"
+                query = f"SELECT {', '.join(self.select_columns)} FROM {self.table_name}"
                 for join_type, join_table, join_condition in zip(self.join_types, self.join_tables, self.join_conditions):
                     query += f" {join_type} JOIN {join_table} ON {join_condition}"
                 if self.where_conditions:

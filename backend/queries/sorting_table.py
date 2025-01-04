@@ -11,7 +11,7 @@ class SortingTableQuery:
     def execute(self):
         try:
             with self.db_engine.connect() as c:
-                query = f"SELECT {", ".join(self.select_columns)} FROM {self.table_name}"
+                query = f"SELECT {', '.join(self.select_columns)} FROM {self.table_name}"
                 orders = []
                 for col, sor in zip(self.order_columns, self.order_sortings):
                     order = f"{col} {sor}"

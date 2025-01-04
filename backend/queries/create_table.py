@@ -21,7 +21,7 @@ class CreateTableQuery:
                 
                 column_defs.extend(self.foreign_keys)
                 
-                query = f"CREATE TABLE {self.table_name} ({", ".join(column_defs)});"
+                query = f"CREATE TABLE {self.table_name} ({', '.join(column_defs)});"
                 c.execute(text(query))
             return "Succeed: Created Table", query
         except Exception as e:

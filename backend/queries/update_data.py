@@ -13,7 +13,7 @@ class UpdateDataQuery:
         try:
             with self.db_engine.connect() as c:
                 with c.begin():
-                    target_data = ", ".join([f"{column} = '{value}'" for column, value in zip(self.target_columns, self.target_values)])
+                    target_data = ', '.join([f"{column} = '{value}'" for column, value in zip(self.target_columns, self.target_values)])
                     query = f"UPDATE {self.table_name} SET {target_data} WHERE {self.condition_column} = '{self.condition_value}'"
                     c.execute(text(query))
 
