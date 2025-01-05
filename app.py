@@ -394,5 +394,5 @@ def export_table():
     else:
         return jsonify({"message": "Failed: Deactivated DB", "query": None})
 
-# if __name__ == "__main__":
-#     app.run(debug=True)
+if __name__ == "__main__":
+    app.run(debug=True)
