@@ -24,10 +24,10 @@
 
             <form method="POST" action="{{ url_for('create_table') }}">
                 <label>CREATE</label>
-                <input type="text" id="tableNameInput" name="tableNameInput" placeholder="Table Name to Create">
+                <input type="text" id="tableNameInput" name="tableNameInput" placeholder="Tbl">
                 <div id="columns">
                     <div class="column">
-                        <input type="text" name="columnNameInput" placeholder="Column Name">
+                        <input type="text" name="columnNameInput" placeholder="Col">
                         <select name="columnTypeInput">
                             <option value="INT">Int</option>
                             <option value="FLOAT">Float</option>
@@ -47,7 +47,7 @@
 
                             <input type="checkbox" id="default-0" name="columnConstraintsInput[0]" value="DEFAULT">
                             <label for="default-0" class="checkbox-label">DEFAULT</label>
-                            <input type="text" name="defaultValueInput[0]" placeholder="Default Value">
+                            <input type="text" name="defaultValueInput[0]" placeholder="Def Val">
 
                             <input type="checkbox" id="unique-0" name="columnConstraintsInput[0]" value="UNIQUE">
                             <label for="unique-0" class="checkbox-label">UNIQUE</label>
@@ -60,20 +60,20 @@
 
                             <input type="checkbox" id="foreign-key-0" name="columnConstraintsInput[0]" value="FOREIGN KEY">
                             <label for="foreign-key-0" class="checkbox-label">FOREIGN KEY</label>
-                            <input type="text" name="foreignTableInput[0]" placeholder="Referenced Table">
-                            <input type="text" name="foreignColumnInput[0]" placeholder="Referenced Column">
+                            <input type="text" name="foreignTableInput[0]" placeholder="Ref Tbl">
+                            <input type="text" name="foreignColumnInput[0]" placeholder="Ref Col">
 
                             <input type="checkbox" id="check-0" name="columnConstraintsInput[0]" value="CHECK">
                             <label for="check-0" class="checkbox-label">CHECK</label>
-                            <input type="text" name="checkValueInput[0]" placeholder="Check Condition">
+                            <input type="text" name="checkValueInput[0]" placeholder="Cond">
 
                             <input type="checkbox" id="on-update-0" name="columnConstraintsInput[0]" value="ON UPDATE">
                             <label for="on-update-0" class="checkbox-label">ON UPDATE</label>
-                            <input type="text" name="onUpdateValueInput[0]" placeholder="On Update Value">
+                            <input type="text" name="onUpdateValueInput[0]" placeholder="Upd Val">
 
                             <input type="checkbox" id="comment-0" name="columnConstraintsInput[0]" value="COMMENT">
                             <label for="comment-0" class="checkbox-label">COMMENT</label>
-                            <input type="text" name="commentValueInput[0]" placeholder="Comment">
+                            <input type="text" name="commentValueInput[0]" placeholder="Cmt">
 
                             <input type="checkbox" id="collation-0" name="columnConstraintsInput[0]" value="COLLATION">
                             <label for="collation-0" class="checkbox-label">COLLATION</label>
@@ -97,17 +97,17 @@
             
             <form method="POST" action="{{ url_for('drop_table') }}">
                 <label>DROP</label>
-                <input type="text" id="dropTableNameInput" name="dropTableNameInput" placeholder="Table Name to Drop">
+                <input type="text" id="dropTableNameInput" name="dropTableNameInput" placeholder="Tbl">
                 <button type="submit">Drop Table</button>
             </form>
 
             <form method="POST" action="{{ url_for('insert_data') }}">
                 <label>INSERT</label>
-                <input type="text" id="tableNameInput" name="tableNameInput" placeholder="Table Name to Insert Data">
+                <input type="text" id="tableNameInput" name="tableNameInput" placeholder="Tbl">
                 <div id="rows">
                     <div class="row">
-                        <input type="text" name="columnNameInput" placeholder="Column Name">
-                        <textarea name="columnValueInput" placeholder="Value e.g. a, b, c, d"></textarea>
+                        <input type="text" name="columnNameInput" placeholder="Col">
+                        <textarea name="columnValueInput" placeholder="Val e.g. a, b, c, d"></textarea>
                     </div>
                 </div>
                 <button type="button" onclick="addRow()">Add Row</button>
@@ -116,13 +116,13 @@
 
             <form method="POST" action="{{ url_for('update_data') }}">
                 <label>UPDATE</label>
-                <input type="text" id="tableNameInput" name="tableNameInput" placeholder="Table Name to Update Data">
-                <input type="text" id="conditionColInput" name="conditionColInput" placeholder="Condition Column Name">
-                <input type="text" id="conditionValueInput" name="conditionValueInput" placeholder="Condition Column Value">
+                <input type="text" id="tableNameInput" name="tableNameInput" placeholder="Tbl">
+                <input type="text" id="conditionColInput" name="conditionColInput" placeholder="Cond Col">
+                <input type="text" id="conditionValueInput" name="conditionValueInput" placeholder="Cond Col Val">
                 <div id="dataUpdates">
                     <div class="dataUpdate">
-                        <input type="text" name="targetColInput" placeholder="Target Column">
-                        <input type="text" name="targetValueInput" placeholder="Target Value">
+                        <input type="text" name="targetColInput" placeholder="Tgt Col">
+                        <input type="text" name="targetValueInput" placeholder="Tgt Col Val">
                     </div>
                 </div>
                 <button type="button" onclick="addTargetUpdate()">Add Target Data</button>
@@ -131,10 +131,10 @@
 
             <form method="POST" action="{{ url_for('delete_data') }}">
                 <label>DELETE</label>
-                <input type="text" id="tableNameInput" name="tableNameInput" placeholder="Table Name to Delete Data">
+                <input type="text" id="tableNameInput" name="tableNameInput" placeholder="Tbl">
                 <div id="deleteConditions">
                     <div class="deleteCondition">
-                        <input type="text" name="columnInput" placeholder="Column Name">
+                        <input type="text" name="columnInput" placeholder="Col">
                         <select name="operatorInput">
                             <option value="=">=</option>
                             <option value="<"><</option>
@@ -149,7 +149,7 @@
                             <option value="IS NULL">IS NULL</option>
                             <option value="IS NOT NULL">IS NOT NULL</option>
                         </select>
-                        <input type="text" name="valueInput" placeholder="Value">
+                        <input type="text" name="valueInput" placeholder="Val">
                         <select name="logicalOperatorInput">
                             <option value="AND">AND</option>
                             <option value="OR">OR</option>
@@ -162,14 +162,14 @@
 
             <form method="POST" action="{{ url_for('modify_table') }}">
                 <label>MODIFY</label>
-                <input type="text" id="tableNameInput" name="tableNameInput" placeholder="Table Name to Modify">
+                <input type="text" id="tableNameInput" name="tableNameInput" placeholder="Tbl">
                 <select name="commandInput">
                     <option value="ADD">ADD</option>
                     <option value="MODIFY">MODIFY</option>
                     <option value="DROP">DROP</option>
                     <option value="RENAME">RENAME</option>
                 </select>
-                <input type="text" name="columnNameInput" placeholder="Column Name">
+                <input type="text" name="columnNameInput" placeholder="Col">
                 <select name="columnTypeInput">
                     <option value="INT">Int</option>
                     <option value="FLOAT">Float</option>
@@ -180,13 +180,13 @@
                     <option value="DATETIME">DateTime</option>
                     <option value="BOOLEAN">Boolean</option>
                 </select>
-                <input type="text" name="columnNewNameInput" placeholder="Column New Name">
+                <input type="text" name="columnNewNameInput" placeholder="Ren Col">
                 <button type="submit">Modify Table</button>
             </form>
 
             <form class="join-form" id="joinForm" method="POST" action="{{ url_for('join_table') }}">
                 <label>JOIN</label>
-                <input type="text" id="tableNameInput" name="tableNameInput" placeholder="Table Name to Base">
+                <input type="text" id="tableNameInput" name="tableNameInput" placeholder="Bs Tbl">
 
                 <div id="join-tables">
                     <div class="join-table">
@@ -198,22 +198,22 @@
                             <option value="CROSS">CROSS JOIN</option>
                             <option value="SELF">SELF JOIN</option>
                         </select>
-                        <input type="text" name="joinTables" placeholder="Join Table">
-                        <input type="text" name="joinConditions" placeholder="ON Condition e.g. table1.column = table2.column">
+                        <input type="text" name="joinTables" placeholder="Jn Tbl">
+                        <input type="text" name="joinConditions" placeholder="Cond e.g. tbl1.col = tbl2.col">
                     </div>
                 </div>
                 <button type="button" onclick="addJoin()">Add JOIN</button>
 
                 <div id="select-columns">
                     <div class="select-column">
-                        <input type="text" name="selectColumns" placeholder="Select Column e.g. table1.column">
+                        <input type="text" name="selectColumns" placeholder="Col e.g. tbl1.col">
                     </div>
                 </div>
                 <button type="button" onclick="addSelectColumn()">Add Select Column</button>
 
                 <div id="where-conditions">
                     <div class="where-condition">
-                        <input type="text" name="whereConditions" placeholder="WHERE Condition e.g. table.column > 100">
+                        <input type="text" name="whereConditions" placeholder="Cond e.g. tbl.col > 100">
                     </div>
                 </div>
                 <button type="button" onclick="addWhereCondition()">Add WHERE Conidtion</button>
@@ -223,11 +223,11 @@
 
             <form class="sorting-form" id="sortingForm" method="POST" action="{{ url_for('sorting_table') }}">
                 <label>SORTING</label>
-                <input type="text" id="tableNameInput" name="tableNameInput" placeholder="Table Name to Sorting">
+                <input type="text" id="tableNameInput" name="tableNameInput" placeholder="Tbl">
                 
                 <div id="sorting-elements">
                     <div class="sorting-element">
-                        <input type="text" name="orderColumnNameInput" placeholder="Order by Column Name">
+                        <input type="text" name="orderColumnNameInput" placeholder="Ord Col">
                         <select name="sortingInput">
                             <option value="ASC">ASC</option>
                             <option value="DESC">DESC</option>
@@ -238,7 +238,7 @@
 
                 <div id="select-sorting-columns">
                     <div class="select-sorting-column">
-                        <input type="text" name="selectColumnNameInput" placeholder="Select Column Name">
+                        <input type="text" name="selectColumnNameInput" placeholder="Sel Col">
                     </div>
                 </div>
                 <button type="button" onclick="addSelectSortingColumn()">Add Select Column</button>
@@ -248,7 +248,7 @@
 
             <form id="exportForm" method="POST" action="{{ url_for('export_table') }}">
                 <label>EXPORT</label>
-                <input type="text" id="exportTableNameInput" name="exportTableNameInput" placeholder="Table Name to Export">
+                <input type="text" id="exportTableNameInput" name="exportTableNameInput" placeholder="Tbl Exp">
                 <button type="submit">Export to Excel</button>
             </form>
         </div>
@@ -257,7 +257,7 @@
                 <h2><span class="highlight">S</span>chema</h2>
                 <div id="db-status"></div>
                 <div id="query-display">
-                    <p id="query-text">"Query"</p>
+                    <p id="query-text">Query</p>
                 </div>
                 <div id="message"></div>
                 <div id="table-list"></div>
@@ -281,8 +281,8 @@
                     <option value="CROSS">CROSS JOIN</option>
                     <option value="SELF">SELF JOIN</option>
                 </select>
-                <input type="text" name="joinTables" placeholder="Join Table">
-                <input type="text" name="joinConditions" placeholder="ON Condition e.g. table1.column = table2.column">
+                <input type="text" name="joinTables" placeholder="Jn Tbl">
+                <input type="text" name="joinConditions" placeholder="Cond e.g. tbl1.col = tbl2.col">
                 <button type="button" onclick="deleteJoinTable(this)">Delete</button>
             `;
             document.getElementById("join-tables").appendChild(joinTableDiv);
@@ -297,7 +297,7 @@
             const selectColumnDiv = document.createElement("div");
             selectColumnDiv.classList.add("select-column");
             selectColumnDiv.innerHTML = `
-                <input type="text" name="selectColumns" placeholder="Select Column e.g. table.column">
+                <input type="text" name="selectColumns" placeholder="Col e.g. tbl.col">
                 <button type="button" onclick="deleteSelectColumn(this)">Delete</button>
             `;
             document.getElementById("select-columns").appendChild(selectColumnDiv);
@@ -312,7 +312,7 @@
             const joinWhereConditionDiv = document.createElement("div");
             joinWhereConditionDiv.classList.add("where-condition");
             joinWhereConditionDiv.innerHTML = `
-                <input type="text" name="whereConditions" placeholder="WHERE Condition e.g. table.column > 100">
+                <input type="text" name="whereConditions" placeholder="Cond e.g. tbl.col > 100">
                 <button type="button" onclick="deleteJoinWhereCondition(this)">Delete</button>
             `;
             document.getElementById("where-conditions").appendChild(joinWhereConditionDiv);
@@ -329,7 +329,7 @@
             const elements = document.getElementsByClassName("column"); 
             const columnIndex = elements.length;
             columnDiv.innerHTML = `
-                <input type="text" name="columnNameInput" placeholder="Column Name">
+                <input type="text" name="columnNameInput" placeholder="Col">
                 <select name="columnTypeInput">
                     <option value="INT">Int</option>
                     <option value="FLOAT">Float</option>
@@ -349,7 +349,7 @@
 
                     <input type="checkbox" id="default-${columnIndex}" name="columnConstraintsInput[${columnIndex}]" value="DEFAULT">
                     <label for="default-${columnIndex}" class="checkbox-label">DEFAULT</label>
-                    <input type="text" name="defaultValueInput[${columnIndex}]" placeholder="Default Value">
+                    <input type="text" name="defaultValueInput[${columnIndex}]" placeholder="Def Val">
 
                     <input type="checkbox" id="unique-${columnIndex}" name="columnConstraintsInput[${columnIndex}]" value="UNIQUE">
                     <label for="unique-${columnIndex}" class="checkbox-label">UNIQUE</label>
@@ -362,20 +362,20 @@
 
                     <input type="checkbox" id="foreign-key-${columnIndex}" name="columnConstraintsInput[${columnIndex}]" value="FOREIGN KEY">
                     <label for="foreign-key-${columnIndex}" class="checkbox-label">FOREIGN KEY</label>
-                    <input type="text" name="foreignTableInput[${columnIndex}]" placeholder="Referenced Table">
-                    <input type="text" name="foreignColumnInput[${columnIndex}]" placeholder="Referenced Column">
+                    <input type="text" name="foreignTableInput[${columnIndex}]" placeholder="Ref Tbl">
+                    <input type="text" name="foreignColumnInput[${columnIndex}]" placeholder="Ref Col">
 
                     <input type="checkbox" id="check-${columnIndex}" name="columnConstraintsInput[${columnIndex}]" value="CHECK">
                     <label for="check-${columnIndex}" class="checkbox-label">CHECK</label>
-                    <input type="text" name="checkValueInput[${columnIndex}]" placeholder="Check Condition">
+                    <input type="text" name="checkValueInput[${columnIndex}]" placeholder="Cond">
 
                     <input type="checkbox" id="on-update-${columnIndex}" name="columnConstraintsInput[${columnIndex}]" value="ON UPDATE">
                     <label for="on-update-${columnIndex}" class="checkbox-label">ON UPDATE</label>
-                    <input type="text" name="onUpdateValueInput[${columnIndex}]" placeholder="On Update Value">
+                    <input type="text" name="onUpdateValueInput[${columnIndex}]" placeholder="Upd Val">
 
                     <input type="checkbox" id="comment-${columnIndex}" name="columnConstraintsInput[${columnIndex}]" value="COMMENT">
                     <label for="comment-${columnIndex}" class="checkbox-label">COMMENT</label>
-                    <input type="text" name="commentValueInput[${columnIndex}]" placeholder="Comment">
+                    <input type="text" name="commentValueInput[${columnIndex}]" placeholder="Cmt">
 
                     <input type="checkbox" id="collation-${columnIndex}" name="columnConstraintsInput[${columnIndex}]" value="COLLATION">
                     <label for="collation-${columnIndex}" class="checkbox-label">COLLATION</label>
@@ -444,8 +444,8 @@
             const rowDiv = document.createElement("div");
             rowDiv.classList.add("row");
             rowDiv.innerHTML = `
-                <input type="text" name="columnNameInput" placeholder="Column Name">
-                <textarea name="columnValueInput" placeholder="Value e.g. a, b, c, d"></textarea>
+                <input type="text" name="columnNameInput" placeholder="Col">
+                <textarea name="columnValueInput" placeholder="Val e.g. a, b, c, d"></textarea>
                 <button type="button" onclick="deleteRow(this)">Delete</button>
             `;
             document.getElementById("rows").appendChild(rowDiv);
@@ -460,8 +460,8 @@
             const dataUpdateDiv = document.createElement("div");
             dataUpdateDiv.classList.add("dataUpdate");
             dataUpdateDiv.innerHTML = `
-                <input type="text" name="targetColInput" placeholder="Target Column">
-                <input type="text" name="targetValueInput" placeholder="Target Value">
+                <input type="text" name="targetColInput" placeholder="Tgt Col">
+                <input type="text" name="targetValueInput" placeholder="Tgt Col Val">
                 <button type="button" onclick="deleteTargetUpdate(this)">Delete</button>
             `;
             document.getElementById("dataUpdates").appendChild(dataUpdateDiv);
@@ -476,7 +476,7 @@
             const deleteConditionDiv = document.createElement("div");
             deleteConditionDiv.classList.add("deleteCondition");
             deleteConditionDiv.innerHTML = `
-                <input type="text" name="columnInput" placeholder="Column Name">
+                <input type="text" name="columnInput" placeholder="Col">
                 <select name="operatorInput">
                     <option value="=">=</option>
                     <option value="<"><</option>
@@ -491,7 +491,7 @@
                     <option value="IS NULL">IS NULL</option>
                     <option value="IS NOT NULL">IS NOT NULL</option>
                 </select>
-                <input type="text" name="valueInput" placeholder="Value">
+                <input type="text" name="valueInput" placeholder="Val">
                 <select name="logicalOperatorInput">
                     <option value="AND">AND</option>
                     <option value="OR">OR</option>
@@ -510,7 +510,7 @@
             const sortingElementDiv = document.createElement("div");
             sortingElementDiv.classList.add("sorting-element");
             sortingElementDiv.innerHTML = `
-                <input type="text" name="orderColumnNameInput" placeholder="Order by Column Name">
+                <input type="text" name="orderColumnNameInput" placeholder="Ord Col">
                 <select name="sortingInput">
                     <option value="ASC">ASC</option>
                     <option value="DESC">DESC</option>
@@ -529,7 +529,7 @@
             const selectSortingColumnDiv = document.createElement("div");
             selectSortingColumnDiv.classList.add("select-sorting-column");
             selectSortingColumnDiv.innerHTML = `
-                <input type="text" name="selectColumnNameInput" placeholder="Select Column Name">
+                <input type="text" name="selectColumnNameInput" placeholder="Sel Col">
                 <button type="button" onclick="deleteSelectSortingColumn(this)">Delete</button>
             `;
             document.getElementById("select-sorting-columns").appendChild(selectSortingColumnDiv);
