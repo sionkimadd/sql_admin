@@ -19,7 +19,7 @@ class InsertDataQuery:
                             if value is None or value == "":
                                 parsed_values.append("NULL")
                             else:
-                                parsed_values.append(f"'{value}'")
+                                parsed_values.append(f"{value}")
                         row_str = ", ".join(parsed_values)
                         values_list.append(f"({row_str})")
                     values_str = ", ".join(values_list)
