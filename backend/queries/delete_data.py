@@ -19,5 +19,20 @@ class DeleteDataQuery:
                     return f"Succeed: Deleted {rows_deleted} Row(s)", query
                 else:
                     return "Warning: Unmatching Data to Delete.", query
-        except Exception:
-            return "Failed: Data Not Deleted", None
+        except Exception as e:
+            error_message = str(e)
+
+            if "(pymysql.err.OperationalError)" in error_message:
+                error_message = error_message.replace("(pymysql.err.OperationalError)", "")
+
+            if "(pymysql.err.ProgrammingError)" in error_message:
+                error_message = error_message.replace("(pymysql.err.ProgrammingError) ", "")
+
+            if "(Background on this error at: https://sqlalche.me/e/20/e3q8)" in error_message:
+                error_message = error_message.replace("(Background on this error at: https://sqlalche.me/e/20/e3q8)", "")
+
+            if "(Background on this error at: https://sqlalche.me/e/20/f405)" in error_message:
+                error_message = error_message.replace("(Background on this error at: https://sqlalche.me/e/20/f405)", "")
+
+            error_message = error_message.strip()
+            return f"Failed: Data Not Deleted - {error_message}", None
