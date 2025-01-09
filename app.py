@@ -1,14 +1,41 @@
+import hashlib
+import os
+import secrets
 import re
-from flask import Flask, request, render_template, jsonify, send_file
+import time
+from dotenv import load_dotenv
+from flask import Flask, request, render_template, jsonify, send_file, session
 from backend import *
-from sqlalchemy import inspect, text
+from sqlalchemy import create_engine, inspect, text
 import pandas as pd
 import io
 
+load_dotenv()
+
 app = Flask(__name__)
 
-db_engine = None
+app.secret_key = os.getenv("SECRET_KEY")
 
+db_connections = {}
+
+def generate_session_key():
+    current_time = str(time.time_ns())
+    random_1 = secrets.token_hex(8)
+    random_2 = secrets.token_hex(8)
+    random_3 = secrets.token_hex(8)
+    raw_session_key = f"{current_time}_{random_1}_{random_2}_{random_3}"
+    return hash_session_key(raw_session_key)
+
+def hash_session_key(raw_session_key):
+    hashed_session_key = hashlib.sha512(raw_session_key.encode()).hexdigest()
+    return hashed_session_key
+
+def get_db_engine():
+    hashed_session_key = session.get("hashed_session_key")
+    if not hashed_session_key or hashed_session_key not in db_connections:
+        return None
+    return db_connections[hashed_session_key]["engine"]
+    
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -16,33 +43,52 @@ def index():
 @app.route("/connect_db", methods=["POST"])
 def connect_db():
     db_url = request.form.get("dbURLInput")
-    global db_engine
+
     if not db_url:
         return jsonify({"message": "Failed: Required DB URL", "query": None})
 
-    connection = ConnectSQL(db_url)
-    message = connection.select_one()
+    if "hashed_session_key" not in session:
+        session["hashed_session_key"] = generate_session_key()
 
-    if message == "Succeed":
-        db_engine = connection.get_engine()
-        query = f"CONNECT TO DATABASE"
-        return jsonify({"message": "Succeed: Connected DB", "query": query})
-    else:
-        return jsonify({"message": message, "query": None})
+    hashed_session_key = session["hashed_session_key"]
+
+    try:
+        if db_url.startswith("mysql://"):
+            db_url = db_url.replace("mysql://", "mysql+pymysql://")
+
+        engine = create_engine(db_url, echo=False)
+
+        with engine.connect() as c:
+            c.execute(text("SELECT 1"))
+
+        db_connections[hashed_session_key] = {
+            "engine": engine
+        }
+
+        return jsonify({"message": "Succeed: Connected DB", "query": "CONNECT TO DATABASE"})
+    except Exception as e:
+        return jsonify({"message": f"Failed: {str(e)}", "query": None})
 
 @app.route("/dispose_db", methods=["POST"])
 def dispose_db():
-    global db_engine
-    if db_engine:
-        disposal = DisposeSQL(db_engine)
-        message = disposal.close_connection()
-        db_engine = None
-        query = "DISPOSE DATABASE CONNECTION"
-        return jsonify({"message": message, "query": query})
-    return jsonify({"message": "Failed: Deactivated DB", "query": None})
+    hashed_session_key = session.get("hashed_session_key")
+    if not hashed_session_key or hashed_session_key not in db_connections:
+        return jsonify({"message": "Failed: No Active DB Connection", "query": None})
+
+    if hashed_session_key in db_connections:
+        db_connections[hashed_session_key]["engine"].dispose()
+        del db_connections[hashed_session_key]
+        session.pop("hashed_session_key", None)
+        return jsonify({"message": "Succeed: Disposed DB", "query": "DISPOSE DATABASE CONNECTION"})
+    else:
+        return jsonify({"message": "Failed: No Active DB Connection", "query": None})
 
 @app.route("/create_table", methods=["POST"])
 def create_table():
+    engine = get_db_engine()
+    if not engine:
+        return jsonify({"message": "Failed: No Active DB Connection", "query": None})
+
     table_name = request.form.get("tableNameInput")
     column_names = request.form.getlist("columnNameInput")
     column_types = request.form.getlist("columnTypeInput")
@@ -72,7 +118,7 @@ def create_table():
             foreign_table = request.form.get(f"foreignTableInput[{i}]")
             foreign_column = request.form.get(f"foreignColumnInput[{i}]")
             if foreign_table and foreign_column:
-                inspector = inspect(db_engine)
+                inspector = inspect(engine)
                 if foreign_table not in inspector.get_table_names():
                     return jsonify({"message": f"Failed: Referenced Table {foreign_table} Unexist", "query": None})
                 
@@ -119,23 +165,31 @@ def create_table():
         
         columns.append((column_names[i], column_types[i], constraint_strs))
 
-    create_table_query = CreateTableQuery(db_engine, table_name, columns, foreign_keys)
+    create_table_query = CreateTableQuery(engine, table_name, columns, foreign_keys)
     message, query = create_table_query.execute()
     return jsonify({"message": message, "query": query})
 
 @app.route("/drop_table", methods=["POST"])
 def drop_table():
+    engine = get_db_engine()
+    if not engine:
+        return jsonify({"message": "Failed: No Active DB Connection", "query": None})
+    
     table_name = request.form.get("dropTableNameInput")
     
     if not table_name:
         return jsonify({"message": "Failed: Undefined Table Name", "query": None})
     
-    drop_table_query = DropTableQuery(db_engine, table_name)
+    drop_table_query = DropTableQuery(engine, table_name)
     message, query = drop_table_query.execute()
     return jsonify({"message": message, "query": query})
 
 @app.route("/insert_data", methods=["POST"])
 def insert_data():
+    engine = get_db_engine()
+    if not engine:
+        return jsonify({"message": "Failed: No Active DB Connection", "query": None})
+    
     table_name = request.form.get("tableNameInput")
     column_names = request.form.getlist("columnNameInput")
     column_values = request.form.getlist("columnValueInput")
@@ -169,31 +223,28 @@ def insert_data():
             row[column_name] = value
         data.append(row)
 
-    insert_data_query = InsertDataQuery(db_engine, table_name, column_names, data)
+    insert_data_query = InsertDataQuery(engine, table_name, column_names, data)
     message, query = insert_data_query.execute()
     return jsonify({"message": message, "query": query})
 
 @app.route("/get_db_info", methods=["GET"])
 def get_db_info():
-    global db_engine
-    if db_engine:
-        db_status = "Connected"
-        status_class = "success"
-    else:
-        db_status = "Unconnected"
-        status_class = "fail"
-    if db_engine:
-        inspector = inspect(db_engine)
-        tables = inspector.get_table_names()
-    else:
-        tables = []
-    return jsonify({"db_status": db_status, "status_class": status_class, "tables": tables})
+    engine = get_db_engine()
+    if not engine:
+        return jsonify({"db_status": "Unconnected", "status_class": "fail", "tables": []})
+
+    inspector = inspect(engine)
+    tables = inspector.get_table_names()
+    return jsonify({"db_status": "Connected", "status_class": "success", "tables": tables})
 
 @app.route("/get_table_data/<table_name>", methods=["GET"])
 def get_table_data(table_name):
-    global db_engine
-    if db_engine:
-        with db_engine.connect() as c:
+    engine = get_db_engine()
+    if not engine:
+        return jsonify({"message": "Failed: No Active DB Connection", "query": None})
+    
+    if engine:
+        with engine.connect() as c:
             query = f"SELECT * FROM {table_name}"
             output = c.execute(text(query))
             rows = []
@@ -216,6 +267,10 @@ def get_table_data(table_name):
 
 @app.route("/update_data", methods=["POST"])
 def update_data():
+    engine = get_db_engine()
+    if not engine:
+        return jsonify({"message": "Failed: No Active DB Connection", "query": None})
+    
     table_name = request.form.get("tableNameInput")
     condition_column = request.form.get("conditionColInput")
     condition_value = request.form.get("conditionValueInput")
@@ -237,12 +292,16 @@ def update_data():
     if not target_values or any(not value.strip() for value in target_values):
         return jsonify({"message": "Failed: Undefined Target Values", "query": None})
     
-    update_data_query = UpdateDataQuery(db_engine, table_name, condition_column, condition_value, target_columns, target_values)
+    update_data_query = UpdateDataQuery(engine, table_name, condition_column, condition_value, target_columns, target_values)
     message, query = update_data_query.execute()
     return jsonify({"message": message, "query": query})
 
 @app.route("/delete_data", methods=["POST"])
 def delete_data():
+    engine = get_db_engine()
+    if not engine:
+        return jsonify({"message": "Failed: No Active DB Connection", "query": None})
+    
     table_name = request.form.get("tableNameInput")
     columns = request.form.getlist("columnInput")
     operators = request.form.getlist("operatorInput")
@@ -278,12 +337,16 @@ def delete_data():
         conditions.append(condition)
         conditions.append(logical_operators[i])
     conditions.pop()
-    delete_data_query = DeleteDataQuery(db_engine, table_name, conditions)
+    delete_data_query = DeleteDataQuery(engine, table_name, conditions)
     message, query = delete_data_query.execute()
     return jsonify({"message": message, "query": query})
 
 @app.route("/modify_table", methods=["POST"])
 def modify_table():
+    engine = get_db_engine()
+    if not engine:
+        return jsonify({"message": "Failed: No Active DB Connection", "query": None})
+    
     table_name = request.form.get("tableNameInput")
     command = request.form.get("commandInput")
     column_name = request.form.get("columnNameInput")
@@ -299,12 +362,16 @@ def modify_table():
     if not column_name or not column_name.strip():
         return jsonify({"message": "Failed: Undefined Column Name", "query": None})
     
-    modify_table_query = ModifyTableQuery(db_engine, table_name, command, column_name, column_type, column_new_name)
+    modify_table_query = ModifyTableQuery(engine, table_name, command, column_name, column_type, column_new_name)
     message, query = modify_table_query.execute()
     return jsonify({"message": message, "query": query})
 
 @app.route("/join_table", methods=["POST"])
 def join_table():
+    engine = get_db_engine()
+    if not engine:
+        return jsonify({"message": "Failed: No Active DB Connection", "query": None})
+
     table_name = request.form.get("tableNameInput")
     join_types = request.form.getlist("joinTypes")
     join_tables = request.form.getlist("joinTables")
@@ -327,7 +394,7 @@ def join_table():
     if not select_columns or any(not select_column.strip() for select_column in select_columns):
         return jsonify({"message": "Failed: Undefined Select Columns", "query": None})
 
-    join_query = JoinTableQuery(db_engine, table_name, join_types, join_tables, join_conditions, select_columns, where_conditions)
+    join_query = JoinTableQuery(engine, table_name, join_types, join_tables, join_conditions, select_columns, where_conditions)
     message, query, rows, column_names = join_query.execute()
     
     return jsonify({
@@ -339,6 +406,10 @@ def join_table():
 
 @app.route("/sorting_table", methods=["POST"])
 def sorting_table():
+    engine = get_db_engine()
+    if not engine:
+        return jsonify({"message": "Failed: No Active DB Connection", "query": None})
+
     table_name = request.form.get("tableNameInput")
     order_columns = request.form.getlist("orderColumnNameInput")
     order_sortings = request.form.getlist("sortingInput")
@@ -356,7 +427,7 @@ def sorting_table():
     if not select_columns or any(not column.strip() for column in select_columns):
         return jsonify({"message": "Failed: Undefined Select Columns", "query": None})
 
-    sorting_query = SortingTableQuery(db_engine, table_name, order_columns, order_sortings, select_columns)
+    sorting_query = SortingTableQuery(engine, table_name, order_columns, order_sortings, select_columns)
     message, query, rows, column_names = sorting_query.execute()
 
     return jsonify({
@@ -368,14 +439,17 @@ def sorting_table():
 
 @app.route("/export_table", methods=["POST"])
 def export_table():
+    engine = get_db_engine()
+    if not engine:
+        return jsonify({"message": "Failed: No Active DB Connection", "query": None})
+
     table_name = request.form.get("exportTableNameInput")
     
     if not table_name or not table_name.strip():
         return jsonify({"message": "Failed: Undefined Table Name", "query": None})
     
-    global db_engine
-    if db_engine:
-        with db_engine.connect() as c:
+    if engine:
+        with engine.connect() as c:
             query = f"SELECT * FROM {table_name}"
             output = c.execute(text(query))
             df = pd.DataFrame(output.fetchall(), columns=output.keys())
