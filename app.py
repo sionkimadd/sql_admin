@@ -540,7 +540,7 @@ def import_excel():
         for row in data:
             for key, value in row.items():
                 if isinstance(value, str):
-                    row[key] = f"'{value.replace("'", "''")}'"
+                    row[key] = f"'{value.replace('\"', '\"\"')}'"
                 elif isinstance(value, (datetime.date, datetime.datetime)):
                     row[key] = f"'{value.strftime('%Y-%m-%d %H:%M:%S')}'"
                 elif value is None:
