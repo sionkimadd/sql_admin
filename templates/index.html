@@ -36,7 +36,7 @@
                             <option value="TEXT">Text</option>
                             <option value="DATE">Date</option>
                             <option value="DATETIME">DateTime</option>
-                            <option value="BOOLEAN">Boolean</option>
+                            <option value="TINYINT(1)">Boolean</option>
                         </select>
                         <div class="constraints">
                             <input type="checkbox" id="not-null-0" name="columnConstraintsInput[0]" value="NOT NULL">
@@ -178,7 +178,7 @@
                     <option value="TEXT">Text</option>
                     <option value="DATE">Date</option>
                     <option value="DATETIME">DateTime</option>
-                    <option value="BOOLEAN">Boolean</option>
+                    <option value="TINYINT(1)">Boolean</option>
                 </select>
                 <input type="text" name="columnNewNameInput" placeholder="Ren Col">
                 <button type="submit">Modify Table</button>
@@ -251,13 +251,20 @@
                 <input type="text" id="exportTableNameInput" name="exportTableNameInput" placeholder="Tbl Exp">
                 <button type="submit">Export to Excel</button>
             </form>
+
+            <form method="POST" action="{{ url_for('import_excel') }}" enctype="multipart/form-data">
+                <label>IMPORT</label>
+                <input type="text" id="importTableNameInput" name="importTableNameInput" placeholder="Tbl Imp">
+                <input type="file" id="importExcelFile" name="importExcelFile" accept=".xlsx, .xls, .csv">
+                <button type="submit">Import Excel</button>
+            </form>
         </div>
         <div class="right-panel">
             <div id="db-info">
                 <h2><span class="highlight">S</span>chema</h2>
                 <div id="db-status"></div>
                 <div id="query-display">
-                    <p id="query-text">Query</p>
+                    <p id="query-text">Hello, EZDB!</p>
                 </div>
                 <div id="message"></div>
                 <div id="table-list"></div>
@@ -338,7 +345,7 @@
                     <option value="TEXT">Text</option>
                     <option value="DATE">Date</option>
                     <option value="DATETIME">DateTime</option>
-                    <option value="BOOLEAN">Boolean</option>
+                    <option value="TINYINT(1)">Boolean</option>
                 </select>
                 <div class="constraints">
                     <input type="checkbox" id="not-null-${columnIndex}" name="columnConstraintsInput[${columnIndex}]" value="NOT NULL">

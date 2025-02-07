@@ -5,10 +5,13 @@ import re
 import time
 from dotenv import load_dotenv
 from flask import Flask, request, render_template, jsonify, send_file, session
+import numpy as np
+import chardet
 from backend import *
 from sqlalchemy import create_engine, inspect, text
 import pandas as pd
 import io
+import datetime
 
 load_dotenv()
 
@@ -468,6 +471,165 @@ def export_table():
     else:
         return jsonify({"message": "Failed: Deactivated DB", "query": None})
 
+@app.route("/import_excel", methods=["POST"])
+def import_excel():
+    engine = get_db_engine()
+    if not engine:
+        return jsonify({"message": "Failed: No Active DB Connection", "query": None})
+    
+    table_name = request.form.get("importTableNameInput")
+    file = request.files.get("importExcelFile")
+
+    if not table_name:
+        return jsonify({"message": "Failed: Undefined Table Name", "query": None})
+    if not file:
+        return jsonify({"message": "Failed: Undefined Excel File", "query": None})
+
+    try:
+        filename = file.filename.lower()
+
+        try:
+
+            if filename.endswith(".csv"):
+                encoding_sample = file.read(7000)
+                file.seek(0)
+
+                detected_encoding = chardet.detect(encoding_sample).get("encoding", "utf-8")
+
+                encodings = list(dict.fromkeys([detected_encoding, "utf-8", "utf-8-sig", "latin1", "iso-8859-1", "windows-1252"]))
+
+                for encoding in encodings:
+                    try:
+                        df = pd.read_csv(file, encoding=encoding, engine="python")
+                        break
+                    except Exception:
+                        file.seek(0)
+                else:
+                    raise ValueError("Undecoded CSV file")
+
+            elif filename.endswith(".xlsx"):
+                file.seek(0)
+                df = pd.read_excel(file, engine="openpyxl")
+
+            elif filename.endswith(".xls"):
+                file.seek(0)
+                df = pd.read_excel(file, engine="xlrd")
+
+            else:
+                raise ValueError("Unsupported file format")
+
+        except Exception as e:
+            return jsonify({"message": f"Failed: {str(e)}", "query": None})
+
+        df.columns = df.columns.str.strip().str.lower()
+
+        normalized_column_names = []
+
+        for column in df.columns:
+            normalized_column_name = re.sub(r"\W+", "_", column.strip())
+            normalized_column_names.append(normalized_column_name)
+            
+        df.columns = normalized_column_names
+
+        normalized_df = df.copy()
+
+        normalized_df = normalized_df.replace({ "N/A": None, np.nan: None })
+
+        data = normalized_df.to_dict(orient="records")
+
+        for row in data:
+            for key, value in row.items():
+                if isinstance(value, str):
+                    row[key] = f"'{value.replace("'", "''")}'"
+                elif isinstance(value, (datetime.date, datetime.datetime)):
+                    row[key] = f"'{value.strftime('%Y-%m-%d %H:%M:%S')}'"
+                elif value is None:
+                    row[key] = None
+
+        def is_integer(val):
+            if isinstance(val, int):
+                return True
+            if isinstance(val, float):
+                return False
+            if isinstance(val, str) and val.isdigit():
+                return True
+            try:
+                return float(val).is_integer()
+            except (ValueError, TypeError):
+                return False
+
+        def is_float(val):
+            if isinstance(val, float):
+                return True
+            if isinstance(val, int):
+                return False
+            if isinstance(val, str):
+                val = val.strip()
+                if val.count(".") == 1 and val.replace(".", "").isdigit():
+                    return True
+            try:
+                float(val)
+                return True
+            except (ValueError, TypeError):
+                return False
+
+        column_types = []
+        df_data = df.iloc[1:].reset_index(drop=True)
+
+        for column in df.columns:
+            dtype = df_data[column].dtype
+            col_data = df[column].dropna()
+            col_str = col_data.astype(str)
+
+            if np.issubdtype(dtype, np.integer):
+                column_types.append("INT")
+            elif np.issubdtype(dtype, np.floating):
+                column_types.append("FLOAT")
+            elif np.issubdtype(dtype, np.bool_):
+                column_types.append("TINYINT(1)")
+            elif np.issubdtype(dtype, np.datetime64):
+                if col_str.str.fullmatch(r"\d{4}-\d{2}-\d{2}").all():
+                    column_types.append("DATE")
+                elif col_str.str.fullmatch(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}").all():
+                    column_types.append("DATETIME")
+                else:
+                    column_types.append("VARCHAR(255)")
+            elif col_data.apply(is_float).all():
+                column_types.append("FLOAT")
+            elif col_data.apply(is_integer).all():
+                column_types.append("INT")
+            elif col_str.str.fullmatch(r"(?i)TRUE|FALSE").all():
+                column_types.append("TINYINT(1)")
+            elif col_str.str.fullmatch(r"\d{4}-\d{2}-\d{2}").all():
+                column_types.append("DATE")
+            elif col_str.str.fullmatch(r"\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}").all():
+                column_types.append("DATETIME")
+            else:
+                max_length = col_str.str.len().max()
+                if max_length is not None and max_length <= 255:
+                    column_types.append("VARCHAR(255)")
+                else:
+                    column_types.append("TEXT")
+
+        create_table_query = CreateTableQuery(
+            engine, 
+            table_name, 
+            list(zip(df.columns, column_types, [None] * len(df.columns))),  
+            []
+        )
+        message, query = create_table_query.execute()
+
+        if "Failed" in message:
+            return jsonify({"message": message, "query": query})
+
+        insert_data_query = InsertDataQuery(engine, table_name, df.columns.tolist(), data)
+        message, query = insert_data_query.execute()
+
+        return jsonify({"message": message, "query": query})
+    
+    except Exception as e:
+        return jsonify({"message": f"Failed: {str(e)}", "query": None})
+    
 # if __name__ == "__main__":
 #     app.run(debug=True)
 if __name__ == "__main__":
