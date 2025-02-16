@@ -353,8 +353,8 @@ button:hover::after {
 }
 
 #query-display #query-text {
-    width: 70%;
-    height: 4rem;
+    width: 80%;
+    height: 10rem;
     padding: 0.5rem;
     display: flex;
     flex-direction: column;
@@ -368,6 +368,30 @@ button:hover::after {
     word-wrap: break-word;
     white-space: pre-wrap;
 }
+
+#uml-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#uml-display #uml-text {
+    width: 80%;
+    height: 20rem;
+    padding: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+    font-size: 0.8rem;
+    background-color: black;
+    color: white;
+    overflow-y: auto;
+    overflow-x: hidden;
+    word-wrap: break-word;
+    white-space: pre-wrap;
+}
+
 #table-list {
     display: flex;
     flex-direction: column;
