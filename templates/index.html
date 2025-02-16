@@ -258,6 +258,12 @@
                 <input type="file" id="importExcelFile" name="importExcelFile" accept=".xlsx, .xls, .csv">
                 <button type="submit">Import Excel</button>
             </form>
+
+            <form id="umlForm" method="POST" action="{{ url_for('generate_uml') }}">
+                <label>ERD</label>
+                <input type="text" id="umlTableNameInput" name="umlTableNameInput" placeholder="Table Name">
+                <button type="submit">Generate ERD</button>
+            </form>                  
         </div>
         <div class="right-panel">
             <div id="db-info">
@@ -265,6 +271,9 @@
                 <div id="db-status"></div>
                 <div id="query-display">
                     <p id="query-text">Hello, EZDB!</p>
+                </div>
+                <div id="uml-display">
+                    <p id="uml-text">ERD...</p>
                 </div>
                 <div id="message"></div>
                 <div id="table-list"></div>
@@ -599,7 +608,12 @@
         }
 
         document.querySelectorAll("form").forEach((form) => {
-            if (form.id !== "joinForm" || form.id !== "sortingForm") {
+            if (
+                form.id !== "joinForm" &&
+                form.id !== "sortingForm" &&
+                form.id !== "exportForm" &&
+                form.id !== "umlForm"
+            ) {
                 form.addEventListener("submit", async function (event) {
                     event.preventDefault();
                     const formData = new FormData(form);
@@ -754,6 +768,20 @@
             } catch (error) {
                 const errorMessage = "Failed: Network Error";
                 document.getElementById("message").innerText = errorMessage;
+            }
+        });
+
+        document.getElementById("umlForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const response = await fetch(this.action, {
+                method: "POST",
+                body: formData
+            });
+            const data = await response.json();
+            document.getElementById("message").innerText = data.message;
+            if (data.uml) {
+                document.getElementById("uml-text").innerText = data.uml;
             }
         });
 
