@@ -453,6 +453,12 @@ th {
     color: white;
 }
 
+#urlInputGroup,
+#customInputGroup {
+    text-align: center;
+    width: 100%;
+}
+
 ::-webkit-scrollbar {
     width: 10px;
 }

@@ -13,7 +13,23 @@
             <h2><span class="highlight">O</span>peration</h2>
             <form method="POST" action="{{ url_for('connect_db') }}">
                 <label>CONNECT</label>
-                <input type="text" id="dbURLInput" name="dbURLInput" placeholder="DB URL">
+
+                <select id="connection_mode" name="connection_mode" onchange="toggleInputMode()">
+                    <option value="url">URL</option>
+                    <option value="custom">Custom</option>
+                </select>
+
+                <div id="urlInputGroup">
+                    <input type="text" id="dbURLInput" name="dbURLInput" placeholder="DB URL">
+                </div>
+                
+                <div id="customInputGroup">
+                    <input type="text" name="username" placeholder="Username">
+                    <input type="password" name="password" placeholder="Password">
+                    <input type="text" name="host" placeholder="Host">
+                    <input type="text" name="port" placeholder="Port">
+                    <input type="text" name="database" placeholder="Database">
+                </div>
                 <button type="submit">Connect</button>
             </form>
             
@@ -285,6 +301,29 @@
     </div>
     
     <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            toggleInputMode();
+        });
+
+        function toggleInputMode() {
+            const mode = document.getElementById("connection_mode").value;
+            const urlInputGroup = document.getElementById("urlInputGroup");
+            const customInputGroup = document.getElementById("customInputGroup");
+
+            if (mode === "url") {
+            urlInputGroup.style.display = "block";
+            customInputGroup.style.display = "none";
+            urlInputGroup.querySelectorAll("input").forEach(input => input.disabled = false);
+            customInputGroup.querySelectorAll("input").forEach(input => input.disabled = true);
+
+            } else if (mode === "custom") {
+            urlInputGroup.style.display = "none";
+            customInputGroup.style.display = "block";
+            urlInputGroup.querySelectorAll("input").forEach(input => input.disabled = true);
+            customInputGroup.querySelectorAll("input").forEach(input => input.disabled = false);
+            }
+        }
+
         function addJoin() {
             const joinTableDiv = document.createElement("div");
             joinTableDiv.classList.add("join-table");
