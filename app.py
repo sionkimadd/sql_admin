@@ -45,11 +45,25 @@ def index():
 
 @app.route("/connect_db", methods=["POST"])
 def connect_db():
-    db_url = request.form.get("dbURLInput")
-
-    if not db_url:
-        return jsonify({"message": "Failed: Required DB URL", "query": None})
-
+    connection_mode = request.form.get("connection_mode")
+    db_url = None
+    if connection_mode == "url":
+        db_url = request.form.get("dbURLInput", "").strip()
+        if not db_url:
+            return jsonify({"message": "Failed: Required DB URL", "query": None})
+    if connection_mode == "custom":
+        username = request.form.get("username", "").strip()
+        password = request.form.get("password", "").strip()
+        host     = request.form.get("host", "").strip()
+        port     = request.form.get("port", "").strip()
+        database = request.form.get("database", "").strip()
+        if not all([username, password, host, port, database]):
+            return jsonify({
+                "message": "Failed: Required custom connection details",
+                "query": None
+            })
+        db_url = f"mysql+pymysql://{username}:{password}@{host}:{port}/{database}"
+    
     if "hashed_session_key" not in session:
         session["hashed_session_key"] = generate_session_key()
 

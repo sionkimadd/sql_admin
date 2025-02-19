@@ -1,4 +1,4 @@
-from .connect_sql import ConnectSQL
+# from .connect_sql import ConnectSQL
 from .dispose_sql import DisposeSQL
 from .queries.create_table import CreateTableQuery
 from .queries.drop_table import DropTableQuery
@@ -10,7 +10,7 @@ from .queries.join_table import JoinTableQuery
 from .queries.sorting_table import SortingTableQuery
 
 __all__ = [ 
-    "ConnectSQL",
+    # "ConnectSQL",
     "DisposeSQL",
     "CreateTableQuery",
     "DropTableQuery",
