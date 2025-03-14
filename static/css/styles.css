@@ -53,6 +53,11 @@ h1 {
     font-size: 24px;
     text-align: center;
     background-color: white;
+    cursor: pointer;
+}
+
+h1:hover {
+    color:#df5f2a;
 }
 
 h2 {
@@ -520,4 +525,197 @@ th {
         margin-left: auto;
         margin-right: auto;
     }
+}
+
+.alt-theme {
+    background-color: #11161a;
+    color: #ffffff;
+}
+
+.alt-theme h1:hover {
+    color:blue;
+}
+
+.alt-theme .container {
+    background-color: #11161a;
+}
+
+.alt-theme h1 {
+    background-color: #11161a;
+    color: #df5f2a;
+}
+
+.alt-theme .left-panel,
+.alt-theme .right-panel {
+    border: none;
+    background-color: #11161a;
+}
+
+.alt-theme button {
+    background-color: #df5f2a;
+    color: #11161a;
+    box-shadow: none;
+    border-radius: 5px;
+    transition: all 0.29s ease;
+    margin-top: 1rem;
+}
+
+.alt-theme button:hover {
+    color: #ffffff;
+    box-shadow: none;
+}
+
+.alt-theme button:hover::before,
+.alt-theme button:hover::after {
+    content: none;
+}
+
+.alt-theme .table-name {
+    background-color: #313d4b;
+    color: #c4c7cb;;
+    border-radius: 5px;
+    transition: all 0.29s ease;
+    box-shadow: none;
+    margin-top: 1rem;
+    margin-bottom: 0rem;
+}
+
+.alt-theme .table-name:hover {
+    background-color: #df5f2a;
+    color: #11161a;
+}
+
+.alt-theme .table-name:hover::before,
+.alt-theme .table-name:hover::after {
+    content: none;
+}
+.alt-theme #query-display #query-text {
+    background-color: #313d4b;
+    color: #ffffff;
+}
+.alt-theme #query-text {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border: none;
+}
+
+.alt-theme #uml-display #uml-text {
+    background-color: #313d4b;
+    color: #ffffff;
+}
+.alt-theme #uml-text {
+    border-bottom-right-radius: 5px;
+    border-bottom-left-radius: 5px;
+    border: none;
+}
+
+.alt-theme table {
+    border: none
+}
+
+.alt-theme th {
+    background-color: #df5f2a;
+    border-radius: 5px 5px 0 0;
+    border: 2px solid #11161a;
+}
+
+.alt-theme td {
+    background-color: #313d4b;
+    color: #ffffff;
+    border: 2px solid #11161a;
+}
+
+.alt-theme form {
+    border-top: none;
+    position: relative;
+}
+
+.alt-theme form::before {
+    content: "";
+    position: absolute;
+    top: 0px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 67%;
+    height: 2px;
+    background-color: #df5f2a;
+}
+
+.alt-theme .constraints {
+    border: 2px solid #df5f2a;
+    border-radius: 5px;
+}
+
+.alt-theme .highlight {
+    color: #df5f2a;
+}
+
+.alt-theme label {
+    color: #ffffff;
+}
+
+.alt-theme .checkbox-label {
+    color: #ffffff;
+    transition: all 0.29s ease;
+}
+
+.alt-theme input[type="checkbox"]:checked + label.checkbox-label {
+    color: #df5f2a;
+}
+
+.alt-theme button:hover::before {
+    border-left-color: #df5f2a;
+}
+
+.alt-theme button:hover::after {
+    border-right-color: #df5f2a;
+}
+
+.alt-theme .table-name:hover::before {
+    border-left-color: #df5f2a;
+}
+
+.alt-theme .table-name:hover::after {
+    border-right-color: #df5f2a;
+}
+
+.alt-theme ::-webkit-scrollbar-track {
+    background: #11161a;
+    border: none;
+    border-radius: 5px;
+}
+
+.alt-theme ::-webkit-scrollbar-thumb {
+    background-color: #df5f2a;
+    border-radius: 5px;
+}
+
+.alt-theme input, 
+.alt-theme textarea, 
+.alt-theme select {
+    background-color: #313d4b;
+    color: #c4c7cb;
+    border: none;
+    border-radius: 5px;
+    transition: all 0.29s ease;
+    border-image: none;
+}
+
+.alt-theme input:focus, 
+.alt-theme textarea:focus, 
+.alt-theme select:focus {
+    outline: none;
+    color: #ffffff;
+}
+
+.alt-theme input::placeholder, 
+.alt-theme textarea::placeholder, 
+.alt-theme select::placeholder {
+    color: #c4c7cb;
+}
+
+.alt-theme .constraints input[type="text"],
+.alt-theme .constraints select {
+    background-color: #313d4b;
+    border: none;
 }

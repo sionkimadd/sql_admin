@@ -7,7 +7,7 @@
     <title>EZDB</title>
 </head>
 <body>
-    <h1>EZDB</h1>
+    <h1 id="title-heading" onclick="toggleTheme()">EZDB</h1>
     <div class="container">
         <div class="left-panel">
             <h2><span class="highlight">O</span>peration</h2>
@@ -301,8 +301,19 @@
     </div>
     
     <script>
+        function toggleTheme() {
+            document.body.classList.toggle('alt-theme');
+            localStorage.setItem('theme', document.body.classList.contains('alt-theme') ? 'alt' : 'default');
+        }
+        
         document.addEventListener("DOMContentLoaded", () => {
             toggleInputMode();
+            
+            const savedTheme = localStorage.getItem('theme');
+            if (savedTheme === null || savedTheme === 'alt') {
+                document.body.classList.add('alt-theme');
+                localStorage.setItem('theme', 'alt');
+            }
         });
 
         function toggleInputMode() {
