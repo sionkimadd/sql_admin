@@ -773,6 +773,43 @@ def generate_uml():
 
     uml_text = "\n".join(full_uml_lines)
     return jsonify({"message": "Succeed: ERD Generated", "uml": uml_text})
+
+@app.route("/execute_custom_query", methods=["POST"])
+def execute_custom_query():
+    engine = get_db_engine()
+    if not engine:
+        return jsonify({"message": "Failed: No Active DB Connection", "query": None})
+    
+    data = request.get_json()
+    sql_query = data.get('query', '').strip()
+    
+    if not sql_query:
+        return jsonify({"message": "Failed: Empty Query", "query": None})
+    
+    try:
+        with engine.connect() as c:
+            is_select = sql_query.strip().upper().startswith("SELECT")
+            
+            if is_select:
+                result = c.execute(text(sql_query))
+                rows = result.fetchall()
+                column_names = result.keys()
+                serializable_rows = [dict(row._mapping) for row in rows]
+                return jsonify({
+                    "message": "Succeed: Query executed successfully",
+                    "query": sql_query,
+                    "rows": serializable_rows,
+                    "column_names": list(column_names)
+                })
+            else:
+                with c.begin():
+                    result = c.execute(text(sql_query))
+                    return jsonify({
+                        "message": "Succeed: Query executed successfully",
+                        "query": sql_query
+                    })
+    except Exception as e:
+        return jsonify({"message": f"Failed: {str(e)}", "query": None})
     
 # if __name__ == "__main__":
 #     app.run(debug=True)
