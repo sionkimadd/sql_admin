@@ -8,6 +8,53 @@
 </head>
 <body>
     <h1 id="title-heading" onclick="toggleTheme()">EZDB</h1>
+    
+    <div class="floating-icons">
+        <div class="floating-icon" onclick="toggleSidebar()"></div>
+    </div>
+    
+    <div class="panel-overlay" id="panelOverlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar-panel" id="sidebarPanel">
+        <div class="sidebar-close" onclick="toggleSidebar()">X</div>
+        <h3><span class="highlight">D</span>atabase Tools</h3>
+        
+        <div class="sidebar-content">
+            <div class="sidebar-section">
+                <h4>Custom SQL Query</h4>
+                <form id="sidebarQueryForm">
+                    <textarea id="sqlQueryInput" placeholder="Enter your SQL query here..."></textarea>
+                    <button type="button" onclick="executeQuery()">Execute</button>
+                    <button type="button" onclick="clearQuery()">Clear</button>
+                </form>
+            </div>
+            
+            <div class="sidebar-section">
+                <h4>Export Table</h4>
+                <form id="sidebarExportForm" method="POST" action="{{ url_for('export_table') }}">
+                    <input type="text" id="sidebarExportTableNameInput" name="exportTableNameInput" placeholder="Table to Export">
+                    <button type="submit">Export to Excel</button>
+                </form>
+            </div>
+            
+            <div class="sidebar-section">
+                <h4>Import Data</h4>
+                <form id="sidebarImportForm" method="POST" action="{{ url_for('import_excel') }}" enctype="multipart/form-data">
+                    <input type="text" id="sidebarImportTableNameInput" name="importTableNameInput" placeholder="Table Name">
+                    <input type="file" id="sidebarImportExcelFile" name="importExcelFile" accept=".xlsx, .xls, .csv">
+                    <button type="submit">Import Excel</button>
+                </form>
+            </div>
+            
+            <div class="sidebar-section">
+                <h4>Entity Relationship Diagram</h4>
+                <form id="sidebarUmlForm" method="POST" action="{{ url_for('generate_uml') }}">
+                    <input type="text" id="sidebarUmlTableNameInput" name="umlTableNameInput" placeholder="Table Name">
+                    <button type="submit">Generate ERD</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    
     <div class="container">
         <div class="left-panel">
             <h2><span class="highlight">O</span>peration</h2>
@@ -261,25 +308,7 @@
 
                 <button type="submit">Sort Table</button>
             </form>
-
-            <form id="exportForm" method="POST" action="{{ url_for('export_table') }}">
-                <label>EXPORT</label>
-                <input type="text" id="exportTableNameInput" name="exportTableNameInput" placeholder="Tbl Exp">
-                <button type="submit">Export to Excel</button>
-            </form>
-
-            <form method="POST" action="{{ url_for('import_excel') }}" enctype="multipart/form-data">
-                <label>IMPORT</label>
-                <input type="text" id="importTableNameInput" name="importTableNameInput" placeholder="Tbl Imp">
-                <input type="file" id="importExcelFile" name="importExcelFile" accept=".xlsx, .xls, .csv">
-                <button type="submit">Import Excel</button>
-            </form>
-
-            <form id="umlForm" method="POST" action="{{ url_for('generate_uml') }}">
-                <label>ERD</label>
-                <input type="text" id="umlTableNameInput" name="umlTableNameInput" placeholder="Table Name">
-                <button type="submit">Generate ERD</button>
-            </form>                  
+                  
         </div>
         <div class="right-panel">
             <div id="db-info">
@@ -661,8 +690,9 @@
             if (
                 form.id !== "joinForm" &&
                 form.id !== "sortingForm" &&
-                form.id !== "exportForm" &&
-                form.id !== "umlForm"
+                form.id !== "sidebarExportForm" &&
+                form.id !== "sidebarImportForm" &&
+                form.id !== "sidebarUmlForm"
             ) {
                 form.addEventListener("submit", async function (event) {
                     event.preventDefault();
@@ -791,7 +821,8 @@
             tableTag.appendChild(tbodyTag);
             tableDataDiv.appendChild(tableTag);
         }
-        document.getElementById("exportForm").addEventListener("submit", async function (event) {
+
+        document.getElementById("sidebarExportForm").addEventListener("submit", async function (event) {
             event.preventDefault();
             const formData = new FormData(this);
 
@@ -811,6 +842,7 @@
                     document.body.appendChild(a);
                     a.click();
                     window.URL.revokeObjectURL(url);
+                    document.getElementById("message").innerText = "Success: Table exported to Excel";
                 } else {
                     const errorMessage = "Failed: Unexistent Table or Unexpected Error";
                     document.getElementById("message").innerText = errorMessage;
@@ -821,7 +853,22 @@
             }
         });
 
-        document.getElementById("umlForm").addEventListener("submit", async function (event) {
+        document.getElementById("sidebarImportForm").addEventListener("submit", async function (event) {
+            event.preventDefault();
+            const formData = new FormData(this);
+            const response = await fetch(this.action, {
+                method: "POST",
+                body: formData
+            });
+            const data = await response.json();
+            document.getElementById("message").innerText = data.message;
+            if (data.query) {
+                document.getElementById("query-text").innerText = data.query;
+            }
+            updateDBInfo();
+        });
+
+        document.getElementById("sidebarUmlForm").addEventListener("submit", async function (event) {
             event.preventDefault();
             const formData = new FormData(this);
             const response = await fetch(this.action, {
@@ -835,6 +882,94 @@
             }
         });
 
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebarPanel');
+            const overlay = document.getElementById('panelOverlay');
+            
+            if (sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+                overlay.style.display = 'none';
+            } else {
+                sidebar.classList.add('active');
+                overlay.style.display = 'block';
+            }
+        }
+        
+        function clearQuery() {
+            document.getElementById('sqlQueryInput').value = '';
+        }
+        
+        async function executeQuery() {
+            const sqlQuery = document.getElementById('sqlQueryInput').value.trim();
+            if (!sqlQuery) {
+                alert('Please enter a SQL query');
+                return;
+            }
+            
+            try {
+                const response = await fetch('{{ url_for("execute_custom_query") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ query: sqlQuery })
+                });
+                
+                const data = await response.json();
+                document.getElementById('message').innerText = data.message;
+                document.getElementById('query-text').innerText = data.query;
+                
+                if (data.rows && data.column_names) {
+                    displayCustomQueryResults(data.rows, data.column_names);
+                }
+                
+                if (data.message.startsWith('Succeed')) {
+                    updateDBInfo();
+                }
+            } catch (error) {
+                document.getElementById('message').innerText = `Failed: ${error.message}`;
+            }
+        }
+        
+        function displayCustomQueryResults(rows, column_names) {
+            const tableDataDiv = document.getElementById("join-output");
+            tableDataDiv.innerHTML = "<h4>SQL Query Result</h4>";
+            
+            const tableTag = document.createElement("table");
+            const theadTag = document.createElement("thead");
+            const tbodyTag = document.createElement("tbody");
+
+            const headerRow = document.createElement("tr");
+            column_names.forEach(columnName => {
+                const thTag = document.createElement("th");
+                thTag.innerText = columnName;
+                headerRow.appendChild(thTag);
+            });
+            theadTag.appendChild(headerRow);
+            tableTag.appendChild(theadTag);
+
+            if (rows.length > 0) {
+                rows.forEach(row => {
+                    const trTag = document.createElement("tr");
+                    column_names.forEach(columnName => {
+                        const tdTag = document.createElement("td");
+                        tdTag.innerText = row[columnName];
+                        trTag.appendChild(tdTag);
+                    });
+                    tbodyTag.appendChild(trTag);
+                });
+            } else {
+                const trNoDataTag = document.createElement("tr");
+                const tdNoDataTag = document.createElement("td");
+                tdNoDataTag.colSpan = column_names.length;
+                tdNoDataTag.innerText = "No Data";
+                trNoDataTag.appendChild(tdNoDataTag);
+                tbodyTag.appendChild(trNoDataTag);
+            }
+            tableTag.appendChild(tbodyTag);
+            tableDataDiv.appendChild(tableTag);
+        }
+        
         window.onbeforeunload = function () {
             navigator.sendBeacon('/dispose_db');
         };
