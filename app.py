@@ -15,11 +15,16 @@ import datetime
 
 load_dotenv()
 
+os.environ["GOOGLE_CLOUD_PROJECT"] = os.getenv("GCP_PROJECT_ID")
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = os.getenv("GCP_CREDENTIALS_PATH")
+
 app = Flask(__name__)
 
 app.secret_key = os.getenv("SECRET_KEY")
 
 db_connections = {}
+
+gemini_chat = GeminiChat()
 
 def generate_session_key():
     current_time = str(time.time_ns())
@@ -811,6 +816,23 @@ def execute_custom_query():
     except Exception as e:
         return jsonify({"message": f"Failed: {str(e)}", "query": None})
     
+@app.route('/chat_with_vertex', methods=['POST'])
+def chat_with_vertex():
+    try:
+        data = request.get_json()
+        user_message = data.get('message', '')
+        
+        response = gemini_chat.get_response(user_message)
+        
+        return jsonify({
+            'response': response
+        })
+        
+    except Exception as e:
+        return jsonify({
+            'response': f'Failed: {str(e)}'
+        }), 500
+
 # if __name__ == "__main__":
 #     app.run(debug=True)
 if __name__ == "__main__":

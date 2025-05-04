@@ -8,6 +8,7 @@ from .queries.delete_data import DeleteDataQuery
 from .queries.modify_table import ModifyTableQuery
 from .queries.join_table import JoinTableQuery
 from .queries.sorting_table import SortingTableQuery
+from .gemini_chat import GeminiChat
 
 __all__ = [ 
     # "ConnectSQL",
@@ -19,5 +20,6 @@ __all__ = [
     "DeleteDataQuery",
     "ModifyTableQuery",
     "JoinTableQuery",
-    "SortingTableQuery"
+    "SortingTableQuery",
+    "GeminiChat",
 ]
