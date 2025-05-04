@@ -11,6 +11,7 @@
     
     <div class="floating-icons">
         <div class="floating-icon" onclick="toggleSidebar()"></div>
+        <div class="floating-icon" onclick="toggleChat()"></div>
     </div>
     
     <div class="panel-overlay" id="panelOverlay" onclick="toggleSidebar()"></div>
@@ -52,6 +53,16 @@
                     <button type="submit">Generate ERD</button>
                 </form>
             </div>
+        </div>
+    </div>
+    
+    <div class="chat-panel" id="chatPanel">
+        <div class="chat-close" onclick="toggleChat()">X</div>
+        <h3><span class="highlight">M</span>ySQL Expert</h3>
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input">
+            <textarea id="chatInput" placeholder="MySQL...?"></textarea>
+            <button onclick="sendMessage()">Ask</button>
         </div>
     </div>
     
@@ -974,6 +985,73 @@
             navigator.sendBeacon('/dispose_db');
         };
         
+        function toggleChat() {
+            const chatPanel = document.getElementById('chatPanel');
+            const overlay = document.getElementById('panelOverlay');
+            
+            if (chatPanel.classList.contains('active')) {
+                chatPanel.classList.remove('active');
+                overlay.style.display = 'none';
+            } else {
+                chatPanel.classList.add('active');
+                overlay.style.display = 'block';
+            }
+        }
+
+        async function sendMessage() {
+            const chatInput = document.getElementById('chatInput');
+            const message = chatInput.value.trim();
+            
+            if (!message) return;
+            
+            appendMessage(message, 'user');
+            chatInput.value = '';
+            
+            try {
+                const response = await fetch('{{ url_for("chat_with_vertex") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+                
+                const data = await response.json();
+                appendMessage(data.response, 'bot');
+            } catch (error) {
+                appendMessage('Failed to send message.', 'bot');
+            }
+        }
+
+        function appendMessage(message, sender) {
+            const chatMessages = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('chat-message', `${sender}-message`);
+            messageDiv.textContent = message;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        document.getElementById('panelOverlay').addEventListener('click', function(e) {
+            if (e.target === this) {
+                const sidebar = document.getElementById('sidebarPanel');
+                const chatPanel = document.getElementById('chatPanel');
+                
+                if (sidebar.classList.contains('active')) {
+                    toggleSidebar();
+                }
+                if (chatPanel.classList.contains('active')) {
+                    toggleChat();
+                }
+            }
+        });
     </script>
 </body>
 </html>
