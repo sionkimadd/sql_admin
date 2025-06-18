@@ -24,7 +24,7 @@ class ModifyTableQuery:
                     return f"Failed: Wrong Command", None
                 c.execute(text(query))
 
-            return "Success: Modified Table", query
+            return "Succeed: Modified Table", query
         except Exception as e:
             error_message = str(e)
 
