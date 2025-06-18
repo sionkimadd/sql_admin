@@ -55,8 +55,14 @@ class RequestHandler:
     @staticmethod
     def parse_delete_conditions(columns, operators, values, logical_operators):
         conditions = []
+        and_pattern = r'\s+and\s+'
+        
+        def handle_between(col, val):
+            parts = re.split(and_pattern, val, flags=re.IGNORECASE)
+            return f"{col} BETWEEN {' AND '.join(parts)}"
+        
         operator_handlers = {
-            "BETWEEN": lambda col, val: f"{col} BETWEEN {' AND '.join(re.split(r'\\s+and\\s+', val, flags=re.IGNORECASE))}",
+            "BETWEEN": handle_between,
             "IN": lambda col, val: f"{col} IN ({', '.join(element.strip() for element in val.split(','))})",
             "NOT IN": lambda col, val: f"{col} NOT IN ({', '.join(element.strip() for element in val.split(','))})",
             "IS NULL": lambda col, val: f"{col} IS NULL",
